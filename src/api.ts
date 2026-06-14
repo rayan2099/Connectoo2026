@@ -137,7 +137,37 @@ export const api = {
     return { user };
   },
 
-  getSections: () => apiRequest<MarketplaceSection[]>('/marketplace/sections'),
+  getSections: async () => {
+    const { data, error } = await supabase
+      .from('marketplace_sections')
+      .select('*, marketplace_subsections(*)')
+      .eq('active', true)
+      .order('sort_order', { ascending: true });
+
+    if (error) throw error;
+
+    return (data || []).map((section: any) => ({
+      id: section.id,
+      slug: section.slug,
+      providerType: section.provider_type,
+      labelAr: section.label_ar,
+      labelEn: section.label_en,
+      descriptionAr: section.description_ar,
+      sortOrder: section.sort_order,
+      active: section.active,
+      subsections: (section.marketplace_subsections || [])
+        .sort((a: any, b: any) => a.sort_order - b.sort_order)
+        .map((sub: any) => ({
+          id: sub.id,
+          sectionId: sub.section_id,
+          slug: sub.slug,
+          labelAr: sub.label_ar,
+          labelEn: sub.label_en,
+          sortOrder: sub.sort_order,
+          active: sub.active,
+        })),
+    }));
+  },
 
   getProviders: (filters: {
     providerType?: string;
