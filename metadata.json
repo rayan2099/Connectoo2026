@@ -1,0 +1,6 @@
+{
+  "name": "Connectoo",
+  "description": "Arabic-first real-time voice call marketplace linking fans with creators and clients with experts.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
