@@ -816,13 +816,13 @@ export default function App() {
             {/* Hero text */}
             <div className="text-center space-y-5 max-w-3xl">
               <span className="text-xs font-extrabold tracking-wide text-teal-700 bg-teal-50 border border-teal-100 px-4 py-2 rounded-full inline-flex items-center gap-2">
-                جاهز لما يحدث الآن
+                مكالمات فورية للطرفين
               </span>
               <h1 className="text-4xl md:text-6xl font-black text-slate-950 tracking-tight leading-tight">
-                افتح كونكتو، اختر شخصاً متاحاً، <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">وتكلم الآن.</span>
+                اتصل بمن تحتاجه، <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">أو استقبل من يحتاجك.</span>
               </h1>
               <p className="text-sm md:text-lg text-slate-600 font-semibold leading-relaxed">
-                لما تكون في موقف وتحتاج رأياً سريعاً، لا تبحث لساعات. محامي، دعم نفسي، صيدلي، خبير تقنية، فني سيارة، أو صانع محتوى تحبه، كلهم على بعد ضغطة.
+                كونكتو يجمع من يريد مكالمة الآن مع مشاهير وخبراء متاحين فوراً، ويمنح المؤثرين وأصحاب الخبرة مكتباً صوتياً لاستقبال مكالمات مدفوعة.
               </p>
             </div>
 
