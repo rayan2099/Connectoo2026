@@ -1040,18 +1040,17 @@ export default function App() {
             </div>
 
             {/* Marketplace preview cards */}
-            <section className="w-full max-w-6xl space-y-5">
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 text-right">
-                <div className="space-y-1">
-                  <p className="text-xs font-black text-teal-700">استكشف السوق قبل التسجيل</p>
+            <section className="w-full max-w-6xl space-y-5 text-right" dir="rtl">
+              <div className="space-y-2 text-right">
+                <div className="space-y-1 max-w-3xl mr-0 ml-auto">
                   <h2 className="text-2xl md:text-3xl font-black text-slate-950">مشاهير وخبراء جاهزون للمكالمة</h2>
+                  <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                    جرّب الفلاتر وشاهد كيف سيظهر مقدمو الخدمة: كل بطاقة تعرض التخصص، السعر، التقييم، وحالة التوفر.
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 font-semibold max-w-md">
-                  جرّب الفلاتر وشاهد كيف سيظهر مقدمو الخدمة: كل بطاقة تعرض التخصص، السعر، التقييم، وحالة التوفر.
-                </p>
               </div>
 
-              <div className="flex flex-wrap justify-end gap-2">
+              <div className="flex flex-wrap justify-start gap-2" dir="rtl">
                 {landingPreviewFilters.map(filter => {
                   const active = landingPreviewFilter === filter.id;
                   return (
@@ -1073,7 +1072,7 @@ export default function App() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {filteredLandingPreviewCards.map(card => (
-                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4 min-h-[290px]">
+                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4 min-h-[290px]" dir="rtl">
                     <div className="flex items-start justify-between gap-3">
                       <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
                         card.accent === 'amber' ? 'bg-amber-50 text-amber-700' :
@@ -1104,7 +1103,7 @@ export default function App() {
                       {card.reason}
                     </p>
 
-                    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500 font-bold">
+                    <div className="flex flex-row-reverse items-center justify-between gap-2 text-[11px] text-slate-500 font-bold">
                       <span className="inline-flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         {card.rating}
@@ -1113,7 +1112,7 @@ export default function App() {
                     </div>
 
                     <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-                      <div>
+                      <div className="text-right">
                         <p className="text-[10px] text-slate-400 font-bold">السعر</p>
                         <p className="text-lg font-black text-slate-950">
                           {card.price}
