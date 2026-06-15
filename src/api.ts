@@ -1,24 +1,13 @@
-import { supabase } from './lib/supabase';
-import { Profile, ProviderSettings, MarketplaceSection, Call, Review, Report, ProviderVerification } from './types';
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import { Profile, ProviderSettings, MarketplaceSection, Call, Review, Report, ProviderVerification, Payment } from './types.js';
 
 const API_BASE = '/api';
 
-function mapProfile(row: any): Profile {
-  return {
-    id: row.id,
-    email: row.email || '',
-    username: row.username,
-    fullName: row.full_name,
-    avatar: row.avatar_url || '',
-    bio: row.bio || '',
-    role: row.role,
-    approved: row.approved,
-    verified: row.verified,
-    banned: row.banned,
-    createdAt: row.created_at,
-  };
-}
-
+// Simple token storage
 export const getAuthToken = (): string | null => {
   return localStorage.getItem('connectoo_token');
 };
@@ -31,38 +20,22 @@ export const clearAuthToken = () => {
   localStorage.removeItem('connectoo_token');
 };
 
-async function getCurrentProfile(): Promise<Profile | null> {
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError) throw authError;
-  if (!authData.user) return null;
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', authData.user.id)
-    .single();
-
-  if (error) throw error;
-  return mapProfile(data);
-}
-
+// Generic fetch wrapper with Bearer token
 async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const { data: sessionData } = await supabase.auth.getSession();
-  const token = sessionData.session?.access_token || getAuthToken();
-
+  const token = getAuthToken();
   const headers = new Headers(options.headers || {});
-
+  
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
-
+  
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
-    headers,
+    headers
   });
 
   if (!res.ok) {
@@ -78,98 +51,28 @@ async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}):
 }
 
 export const api = {
-  signup: async (body: {
-    email: string;
-    password: string;
-    username: string;
-    fullName: string;
-    role: 'client' | 'provider';
-  }) => {
-    const { data, error } = await supabase.auth.signUp({
-      email: body.email,
-      password: body.password,
-      options: {
-        data: {
-          role: body.role,
-          username: body.username,
-          full_name: body.fullName,
-        },
-      },
-    });
-
-    if (error) throw error;
-
-    const user = await getCurrentProfile();
-    if (!user) throw new Error('تم إنشاء الحساب، الرجاء تأكيد البريد ثم تسجيل الدخول');
-
-    const token = data.session?.access_token || '';
-    if (token) setAuthToken(token);
-
-    return { user, token };
-  },
-
-  login: async (body: { email: string; password: string }) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: body.email,
-      password: body.password,
-    });
-
-    if (error) throw error;
-
-    const user = await getCurrentProfile();
-    if (!user) throw new Error('لم يتم العثور على ملف المستخدم');
-
-    const token = data.session.access_token;
-    setAuthToken(token);
-
-    return { user, token };
-  },
-
-  logout: async () => {
+  // Auth
+  signup: (body: any) => apiRequest<{ user: Profile; token: string }>('/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  }),
+  
+  login: (body: any) => apiRequest<{ user: Profile; token: string }>('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  }),
+  
+  logout: () => {
     clearAuthToken();
-    await supabase.auth.signOut();
-    return { success: true };
+    return apiRequest('/auth/logout', { method: 'POST' });
   },
+  
+  me: () => apiRequest<{ user: Profile }>('/auth/me'),
 
-  me: async () => {
-    const user = await getCurrentProfile();
-    if (!user) throw new Error('غير مسجل الدخول');
-    return { user };
-  },
-
-  getSections: async () => {
-    const { data, error } = await supabase
-      .from('marketplace_sections')
-      .select('*, marketplace_subsections(*)')
-      .eq('active', true)
-      .order('sort_order', { ascending: true });
-
-    if (error) throw error;
-
-    return (data || []).map((section: any) => ({
-      id: section.id,
-      slug: section.slug,
-      providerType: section.provider_type,
-      labelAr: section.label_ar,
-      labelEn: section.label_en,
-      descriptionAr: section.description_ar,
-      sortOrder: section.sort_order,
-      active: section.active,
-      subsections: (section.marketplace_subsections || [])
-        .sort((a: any, b: any) => a.sort_order - b.sort_order)
-        .map((sub: any) => ({
-          id: sub.id,
-          sectionId: sub.section_id,
-          slug: sub.slug,
-          labelAr: sub.label_ar,
-          labelEn: sub.label_en,
-          sortOrder: sub.sort_order,
-          active: sub.active,
-        })),
-    }));
-  },
-
-  getProviders: async (filters: {
+  // Marketplace
+  getSections: () => apiRequest<MarketplaceSection[]>('/marketplace/sections'),
+  
+  getProviders: (filters: {
     providerType?: string;
     category?: string;
     specialty?: string;
@@ -177,406 +80,105 @@ export const api = {
     onlineOnly?: boolean;
     language?: string;
   } = {}) => {
-    let query = supabase
-      .from('provider_settings')
-      .select('*, profiles!inner(*)')
-      .eq('profiles.role', 'provider')
-      .eq('profiles.approved', true)
-      .eq('profiles.banned', false);
+    const params = new URLSearchParams();
+    if (filters.providerType) params.append('providerType', filters.providerType);
+    if (filters.category) params.append('category', filters.category);
+    if (filters.specialty) params.append('specialty', filters.specialty);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.onlineOnly) params.append('onlineOnly', 'true');
+    if (filters.language) params.append('language', filters.language);
 
-    if (filters.providerType) query = query.eq('provider_type', filters.providerType);
-    if (filters.category) query = query.eq('category_slug', filters.category);
-    if (filters.specialty) query = query.contains('specialty_slugs', [filters.specialty]);
-    if (filters.onlineOnly) query = query.eq('availability_status', 'online');
-    if (filters.language) query = query.contains('languages', [filters.language]);
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    let providers = (data || []).map((row: any) => {
-      const profile = row.profiles;
-      return {
-        id: profile.id,
-        email: profile.email || '',
-        username: profile.username,
-        fullName: profile.full_name,
-        avatar: profile.avatar_url || '',
-        bio: profile.bio || '',
-        role: profile.role,
-        approved: profile.approved,
-        verified: profile.verified,
-        banned: profile.banned,
-        createdAt: profile.created_at,
-        settings: {
-          id: row.id,
-          userId: row.user_id,
-          providerType: row.provider_type,
-          availabilityStatus: row.availability_status,
-          categorySlug: row.category_slug,
-          specialtySlugs: row.specialty_slugs || [],
-          languages: row.languages || ['العربية'],
-          pricePerMinute: Number(row.price_per_minute || 0),
-          updatedAt: row.updated_at,
-        },
-        avgRating: 5,
-        reviewsCount: 0,
-      };
-    });
-
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      providers = providers.filter((provider: any) =>
-        provider.fullName.toLowerCase().includes(q) ||
-        provider.username.toLowerCase().includes(q) ||
-        provider.bio.toLowerCase().includes(q)
-      );
-    }
-
-    return providers;
+    return apiRequest<any[]>(`/marketplace/providers?${params.toString()}`);
   },
 
-  getProviderProfile: async (username: string) => {
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('username', username)
-      .eq('role', 'provider')
-      .eq('approved', true)
-      .eq('banned', false)
-      .single();
+  matchProviders: (body: {
+    prompt: string;
+    providerType?: string;
+    category?: string;
+    onlineOnly?: boolean;
+    language?: string;
+  }) => apiRequest<{ providers: any[]; summary: string }>('/match/providers', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  }),
+  
+  getProviderProfile: (username: string) => apiRequest<any>(`/marketplace/providers/${username}`),
 
-    if (profileError) throw profileError;
+  // Provider Settings
+  getProviderSettings: (userId: string) => apiRequest<ProviderSettings>(`/provider-settings/${userId}`),
+  
+  updateProviderSettings: (userId: string, body: any) => apiRequest<{ settings: ProviderSettings; user: Profile }>(`/provider-settings/${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body)
+  }),
 
-    const { data: settings, error: settingsError } = await supabase
-      .from('provider_settings')
-      .select('*')
-      .eq('user_id', profile.id)
-      .maybeSingle();
+  // Calls
+  createCall: (providerId: string) => apiRequest<Call>('/calls', {
+    method: 'POST',
+    body: JSON.stringify({ providerId })
+  }),
+  
+  getCalls: () => apiRequest<Call[]>('/calls'),
+  
+  getCallById: (id: string) => apiRequest<Call>(`/calls/${id}`),
+  
+  updateCallStatus: (id: string, status: Call['status'], durationSeconds?: number) => apiRequest<Call>(`/calls/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status, durationSeconds })
+  }),
 
-    if (settingsError) throw settingsError;
+  // Agora Tokens
+  getAgoraToken: (callId: string, channelName: string) => apiRequest<{ appId: string; token: string; channelName: string; uid: number }>('/agora/token', {
+    method: 'POST',
+    body: JSON.stringify({ callId, channelName })
+  }),
 
-    const { data: reviews, error: reviewsError } = await supabase
-      .from('reviews')
-      .select('*')
-      .eq('provider_id', profile.id)
-      .order('created_at', { ascending: false });
-
-    if (reviewsError) throw reviewsError;
-
-    const mappedReviews = (reviews || []).map((review: any) => ({
-      id: review.id,
-      reviewerId: review.reviewer_id,
-      providerId: review.provider_id,
-      callId: review.call_id,
-      rating: review.rating,
-      comment: review.comment || '',
-      createdAt: review.created_at,
-    }));
-
-    const avgRating = mappedReviews.length > 0
-      ? Math.round((mappedReviews.reduce((sum: number, review: any) => sum + review.rating, 0) / mappedReviews.length) * 10) / 10
-      : 5;
-
-    return {
-      ...mapProfile(profile),
-      settings: settings
-        ? {
-            id: settings.id,
-            userId: settings.user_id,
-            providerType: settings.provider_type,
-            availabilityStatus: settings.availability_status,
-            categorySlug: settings.category_slug,
-            specialtySlugs: settings.specialty_slugs || [],
-            languages: settings.languages || ['العربية'],
-            pricePerMinute: Number(settings.price_per_minute || 0),
-            updatedAt: settings.updated_at,
-          }
-        : null,
-      reviews: mappedReviews,
-      avgRating,
-      reviewsCount: mappedReviews.length,
-    };
-  },
-
-  getProviderSettings: async (userId: string) => {
-    const { data, error } = await supabase
-      .from('provider_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error) throw error;
-    if (!data) return null as any;
-
-    return {
-      id: data.id,
-      userId: data.user_id,
-      providerType: data.provider_type,
-      availabilityStatus: data.availability_status,
-      categorySlug: data.category_slug,
-      specialtySlugs: data.specialty_slugs || [],
-      languages: data.languages || ['العربية'],
-      pricePerMinute: Number(data.price_per_minute || 0),
-      updatedAt: data.updated_at,
-    };
-  },
-
-  updateProviderSettings: async (userId: string, body: any) => {
-    const profileUpdates: any = {};
-    if (body.fullName !== undefined) profileUpdates.full_name = body.fullName;
-    if (body.bio !== undefined) profileUpdates.bio = body.bio;
-    if (body.avatar !== undefined) profileUpdates.avatar_url = body.avatar;
-
-    if (Object.keys(profileUpdates).length > 0) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update(profileUpdates)
-        .eq('id', userId);
-
-      if (profileError) throw profileError;
-    }
-
-    const settingsUpdates: any = {};
-    if (body.providerType !== undefined) settingsUpdates.provider_type = body.providerType;
-    if (body.availabilityStatus !== undefined) settingsUpdates.availability_status = body.availabilityStatus;
-    if (body.categorySlug !== undefined) settingsUpdates.category_slug = body.categorySlug;
-    if (body.specialtySlugs !== undefined) settingsUpdates.specialty_slugs = body.specialtySlugs;
-    if (body.languages !== undefined) settingsUpdates.languages = body.languages;
-    if (body.pricePerMinute !== undefined) settingsUpdates.price_per_minute = body.pricePerMinute;
-
-    const { data: settingsRow, error: settingsError } = await supabase
-      .from('provider_settings')
-      .upsert(
-        {
-          user_id: userId,
-          provider_type: settingsUpdates.provider_type || 'creator',
-          category_slug: settingsUpdates.category_slug || 'creators-celebrities',
-          specialty_slugs: settingsUpdates.specialty_slugs || [],
-          languages: settingsUpdates.languages || ['العربية'],
-          price_per_minute: settingsUpdates.price_per_minute ?? 10,
-          ...settingsUpdates,
-        },
-        { onConflict: 'user_id' }
-      )
-      .select('*')
-      .single();
-
-    if (settingsError) throw settingsError;
-
-    const { data: profileRow, error: profileLoadError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (profileLoadError) throw profileLoadError;
-
-    return {
-      settings: {
-        id: settingsRow.id,
-        userId: settingsRow.user_id,
-        providerType: settingsRow.provider_type,
-        availabilityStatus: settingsRow.availability_status,
-        categorySlug: settingsRow.category_slug,
-        specialtySlugs: settingsRow.specialty_slugs || [],
-        languages: settingsRow.languages || ['العربية'],
-        pricePerMinute: Number(settingsRow.price_per_minute || 0),
-        updatedAt: settingsRow.updated_at,
-      },
-      user: mapProfile(profileRow),
-    };
-  },
-
-  createCall: async (providerId: string) => {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('غير مسجل الدخول');
-
-    if (authData.user.id === providerId) {
-      throw new Error('لا يمكنك الاتصال بنفس حسابك');
-    }
-
-    const { data: settings, error: settingsError } = await supabase
-      .from('provider_settings')
-      .select('price_per_minute, availability_status, accepts_instant_calls')
-      .eq('user_id', providerId)
-      .single();
-
-    if (settingsError) throw settingsError;
-
-    if (settings.availability_status !== 'online' || !settings.accepts_instant_calls) {
-      throw new Error('مزود الخدمة غير متاح للمكالمات الآن');
-    }
-
-    const channelName = `connectoo_${authData.user.id.slice(0, 8)}_${providerId.slice(0, 8)}_${Date.now()}`;
-
-    const { data, error } = await supabase
-      .from('calls')
-      .insert({
-        client_id: authData.user.id,
-        provider_id: providerId,
-        channel_name: channelName,
-        status: 'ringing',
-        price_per_minute: settings.price_per_minute || 0,
-        currency: 'SAR',
-      })
-      .select('*')
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      clientId: data.client_id,
-      providerId: data.provider_id,
-      channelName: data.channel_name,
-      status: data.status,
-      startedAt: data.started_at,
-      endedAt: data.ended_at,
-      durationSeconds: data.duration_seconds,
-      createdAt: data.created_at,
-    };
-  },
-
-  getCalls: async () => {
-    const { data: authData, error: authError } = await supabase.auth.getUser();
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('غير مسجل الدخول');
-
-    const { data, error } = await supabase
-      .from('calls')
-      .select('*')
-      .or(`client_id.eq.${authData.user.id},provider_id.eq.${authData.user.id}`)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return (data || []).map((call: any) => ({
-      id: call.id,
-      clientId: call.client_id,
-      providerId: call.provider_id,
-      channelName: call.channel_name,
-      status: call.status,
-      startedAt: call.started_at,
-      endedAt: call.ended_at,
-      durationSeconds: call.duration_seconds,
-      createdAt: call.created_at,
-    }));
-  },
-
-  getCallById: async (id: string) => {
-    const { data, error } = await supabase
-      .from('calls')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      clientId: data.client_id,
-      providerId: data.provider_id,
-      channelName: data.channel_name,
-      status: data.status,
-      startedAt: data.started_at,
-      endedAt: data.ended_at,
-      durationSeconds: data.duration_seconds,
-      createdAt: data.created_at,
-    };
-  },
-
-  updateCallStatus: async (id: string, status: Call['status'], durationSeconds?: number) => {
-    const updates: any = { status };
-
-    if (status === 'active') {
-      updates.started_at = new Date().toISOString();
-    }
-
-    if (status === 'completed' || status === 'rejected' || status === 'missed') {
-      updates.ended_at = new Date().toISOString();
-      if (durationSeconds !== undefined) {
-        updates.duration_seconds = durationSeconds;
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('calls')
-      .update(updates)
-      .eq('id', id)
-      .select('*')
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      clientId: data.client_id,
-      providerId: data.provider_id,
-      channelName: data.channel_name,
-      status: data.status,
-      startedAt: data.started_at,
-      endedAt: data.ended_at,
-      durationSeconds: data.duration_seconds,
-      createdAt: data.created_at,
-    };
-  },
-
-  getAgoraToken: (callId: string, channelName: string) =>
-    apiRequest<{ appId: string; token: string; channelName: string; uid: number }>('/agora/token', {
-      method: 'POST',
-      body: JSON.stringify({ callId, channelName }),
-    }),
-
-  submitReview: (body: { providerId: string; callId: string; rating: number; comment: string }) =>
-    apiRequest<Review>('/reviews', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
-
+  // Reviews
+  submitReview: (body: { providerId: string; callId: string; rating: number; comment: string }) => apiRequest<Review>('/reviews', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  }),
+  
   getReviews: (providerId: string) => apiRequest<Review[]>(`/providers/${providerId}/reviews`),
 
-  reportUser: (reportedId: string, reason: string) =>
-    apiRequest<any>('/safety/report', {
-      method: 'POST',
-      body: JSON.stringify({ reportedId, reason }),
-    }),
+  // Safety Reporting & Blocking
+  reportUser: (reportedId: string, reason: string) => apiRequest<any>('/safety/report', {
+    method: 'POST',
+    body: JSON.stringify({ reportedId, reason })
+  }),
+  
+  blockUser: (blockedId: string) => apiRequest<any>('/safety/block', {
+    method: 'POST',
+    body: JSON.stringify({ blockedId })
+  }),
 
-  blockUser: (blockedId: string) =>
-    apiRequest<any>('/safety/block', {
-      method: 'POST',
-      body: JSON.stringify({ blockedId }),
-    }),
+  // Expert Verification Request
+  submitVerification: (body: { profession: string; jurisdiction: string; licenseNumber: string; notes?: string }) => apiRequest<ProviderVerification>('/provider/verify', {
+    method: 'POST',
+    body: JSON.stringify(body)
+  }),
 
-  submitVerification: (body: { profession: string; jurisdiction: string; licenseNumber: string; notes?: string }) =>
-    apiRequest<ProviderVerification>('/provider/verify', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
-
+  // Admin
   getAdminUsers: () => apiRequest<Profile[]>('/admin/users'),
-
+  
   approveUser: (id: string) => apiRequest<Profile>(`/admin/users/${id}/approve`, { method: 'PATCH' }),
-
+  
   rejectUser: (id: string) => apiRequest<any>(`/admin/users/${id}/reject`, { method: 'DELETE' }),
-
-  banUser: (id: string, ban: boolean) =>
-    apiRequest<Profile>(`/admin/users/${id}/ban`, {
-      method: 'PATCH',
-      body: JSON.stringify({ ban }),
-    }),
-
-  getAdminReports: () => apiRequest<Report[]>('/admin/reports'),
-
+  
+  banUser: (id: string, ban: boolean) => apiRequest<Profile>(`/admin/users/${id}/ban`, {
+    method: 'PATCH',
+    body: JSON.stringify({ ban })
+  }),
+  
+  getAdminReports: () => apiRequest<any[]>('/admin/reports'),
+  
   deleteReport: (id: string) => apiRequest<any>(`/admin/reports/${id}`, { method: 'DELETE' }),
-
+  
   getAdminVerifications: () => apiRequest<ProviderVerification[]>('/admin/verifications'),
-
-  approveVerification: (id: string) =>
-    apiRequest<ProviderVerification>(`/admin/verifications/${id}/approve`, { method: 'PATCH' }),
-
-  rejectVerification: (id: string) =>
-    apiRequest<ProviderVerification>(`/admin/verifications/${id}/reject`, { method: 'PATCH' }),
-
-  getAdminAnalytics: () => apiRequest<any>('/admin/analytics'),
+  
+  approveVerification: (id: string) => apiRequest<ProviderVerification>(`/admin/verifications/${id}/approve`, { method: 'PATCH' }),
+  
+  rejectVerification: (id: string) => apiRequest<ProviderVerification>(`/admin/verifications/${id}/reject`, { method: 'PATCH' }),
+  
+  getAdminAnalytics: () => apiRequest<any>('/admin/analytics')
 };

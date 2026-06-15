@@ -58,7 +58,7 @@ async function startServer() {
   // --- Auth Enpoints ---
   app.post('/api/auth/signup', (req: Request, res: Response) => {
     try {
-      const { email, password, username, fullName, role } = req.body;
+      const { email, password, username, fullName, role, bio, providerType } = req.body;
       
       if (!email || !password || !username || !fullName || !role) {
         return res.status(400).json({ error: 'جميع الحقول مطلوبة!' });
@@ -86,9 +86,21 @@ async function startServer() {
         username,
         fullName,
         avatar: `https://images.unsplash.com/photo-${role === 'provider' ? '1534528741775-53994a69daeb' : '1535713875002-d1d0cf377fde'}?w=150`,
-        bio: role === 'provider' ? 'أهلاً بكم في صفحتي الشخصية كخبير/مبدع على كونكتو.' : 'مستخدم على منصة كونكتو.',
+        bio: role === 'provider' && bio?.trim()
+          ? bio.trim()
+          : role === 'provider'
+            ? 'أهلاً بكم في صفحتي الشخصية كخبير/مبدع على كونكتو.'
+            : 'مستخدم على منصة كونكتو.',
         role
       });
+
+      if (role === 'provider') {
+        const safeProviderType = providerType === 'expert' ? 'expert' : 'creator';
+        dbOperations.updateProviderSettings(profile.id, {
+          providerType: safeProviderType,
+          categorySlug: safeProviderType === 'creator' ? 'creators-celebrities' : 'legal'
+        });
+      }
 
       // Simple response
       res.status(201).json({ user: profile, token: profile.id });
@@ -172,12 +184,23 @@ async function startServer() {
       }
 
       if (search) {
-        const queryLower = (search as string).toLowerCase();
-        renderedProv = renderedProv.filter(r => 
-          r.fullName.toLowerCase().includes(queryLower) || 
-          r.username.toLowerCase().includes(queryLower) ||
-          r.bio.toLowerCase().includes(queryLower)
-        );
+        const queryTerms = (search as string)
+          .toLowerCase()
+          .split(/\s+/)
+          .map(term => term.trim())
+          .filter(term => term.length > 2);
+
+        renderedProv = renderedProv.filter(r => {
+          const haystack = [
+            r.fullName,
+            r.username,
+            r.bio,
+            r.settings?.categorySlug,
+            ...(r.settings?.specialtySlugs || [])
+          ].join(' ').toLowerCase();
+
+          return queryTerms.length === 0 || queryTerms.some(term => haystack.includes(term));
+        });
       }
 
       if (onlineOnly === 'true') {
@@ -215,6 +238,100 @@ async function startServer() {
         reviews,
         avgRating,
         reviewsCount: reviews.length
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/match/providers', (req: Request, res: Response) => {
+    try {
+      const { prompt, providerType, category, onlineOnly, language } = req.body;
+      const cleanPrompt = String(prompt || '').trim();
+
+      if (!cleanPrompt) {
+        return res.status(400).json({ error: 'اكتب ما تحتاجه حتى نطابقك مع الشخص المناسب' });
+      }
+
+      const terms = cleanPrompt
+        .toLowerCase()
+        .split(/\s+/)
+        .map((term: string) => term.trim())
+        .filter((term: string) => term.length > 2);
+
+      const weightedSignals = [
+        { category: 'creators-celebrities', terms: ['مشهور', 'مؤثر', 'فنان', 'لاعب', 'تهنئة', 'متابع', 'جمهور'], weight: 8 },
+        { category: 'legal', terms: ['قانون', 'محامي', 'شرطة', 'بلاغ', 'حادث', 'عقد', 'حقوق', 'مخالفة'], weight: 8 },
+        { category: 'medical-guidance', terms: ['دواء', 'صيدلي', 'طبيب', 'أعراض', 'حرارة', 'علاج', 'طفل'], weight: 8 },
+        { category: 'emotional-support', terms: ['قلق', 'توتر', 'ضغط', 'خوف', 'علاقة', 'انفصال', 'نفسية'], weight: 8 },
+        { category: 'tech-support', terms: ['حساب', 'تهكر', 'مخترق', 'جوال', 'لابتوب', 'انترنت', 'برمجة'], weight: 8 },
+        { category: 'home-car', terms: ['سيارة', 'ميكانيكي', 'بطارية', 'مكيف', 'كهرباء', 'سباكة', 'عطل'], weight: 8 },
+        { category: 'career-business', terms: ['وظيفة', 'مقابلة', 'راتب', 'مشروع', 'تسويق', 'شركة', 'عمل'], weight: 8 },
+        { category: 'life-coaching', terms: ['قرار', 'حياة', 'عادة', 'هدف', 'تحفيز', 'ثقة', 'تواصل'], weight: 8 }
+      ];
+
+      const inferredCategory = weightedSignals
+        .map(signal => ({
+          ...signal,
+          score: signal.terms.reduce((total, term) => total + (cleanPrompt.toLowerCase().includes(term) ? signal.weight : 0), 0)
+        }))
+        .sort((a, b) => b.score - a.score)[0];
+
+      const profiles = dbOperations
+        .getProfiles()
+        .filter(p => p.role === 'provider' && p.approved && !p.banned)
+        .map(p => {
+          const settings = dbOperations.getProviderSettings(p.id);
+          const reviews = dbOperations.getReviews(p.id);
+          const avgRating = reviews.length > 0
+            ? Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) * 10) / 10
+            : 5.0;
+
+          return { ...p, settings, avgRating, reviewsCount: reviews.length };
+        })
+        .filter(p => !providerType || p.settings?.providerType === providerType)
+        .filter(p => !category || p.settings?.categorySlug === category)
+        .filter(p => onlineOnly !== true || p.settings?.availabilityStatus === 'online')
+        .filter(p => !language || p.settings?.languages?.includes(language));
+
+      const ranked = profiles
+        .map(provider => {
+          const searchableText = [
+            provider.fullName,
+            provider.username,
+            provider.bio,
+            provider.settings?.providerType,
+            provider.settings?.categorySlug,
+            ...(provider.settings?.specialtySlugs || []),
+            ...(provider.settings?.languages || [])
+          ].join(' ').toLowerCase();
+
+          const termScore = terms.reduce((score, term) => score + (searchableText.includes(term) ? 5 : 0), 0);
+          const categoryScore = inferredCategory?.score > 0 && provider.settings?.categorySlug === inferredCategory.category ? 18 : 0;
+          const availabilityScore = provider.settings?.availabilityStatus === 'online' ? 15 : provider.settings?.availabilityStatus === 'busy' ? 5 : 0;
+          const verificationScore = provider.verified ? 8 : 0;
+          const ratingScore = Math.round((provider.avgRating || 0) * 2);
+          const bioScore = provider.bio && provider.bio.length > 80 ? 6 : 0;
+          const priceScore = provider.settings?.pricePerMinute <= 75 ? 3 : 0;
+
+          return {
+            ...provider,
+            matchScore: termScore + categoryScore + availabilityScore + verificationScore + ratingScore + bioScore + priceScore,
+            matchReason: categoryScore > 0
+              ? 'مطابق للمسار الأقرب لوصفك، مع توفر وسيرة مناسبة.'
+              : termScore > 0
+                ? 'وجدنا كلمات قريبة من وصفك داخل نبذة مقدم الخدمة.'
+                : 'اقتراح عام بناءً على التوفر والتقييم وجودة الملف.'
+          };
+        })
+        .sort((a, b) => b.matchScore - a.matchScore)
+        .slice(0, 5);
+
+      res.json({
+        providers: ranked,
+        summary: ranked.length > 0
+          ? `وجدنا ${ranked.length} مرشحين الأقرب لوصفك.`
+          : 'لم نجد مطابقاً قوياً الآن. جرّب وصفاً أوسع أو أزل شرط المتاحين الآن.'
       });
     } catch (err: any) {
       res.status(500).json({ error: err.message });

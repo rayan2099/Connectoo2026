@@ -13,6 +13,7 @@ interface ProviderCardProps {
     settings?: ProviderSettings;
     avgRating: number;
     reviewsCount: number;
+    matchReason?: string;
   };
   onCallClick: (providerId: string) => any;
   onProfileClick: (username: string) => any;
@@ -96,6 +97,12 @@ export default function ProviderCard({ provider, onCallClick, onProfileClick }: 
         <p className="text-xs text-slate-600 leading-relaxed font-semibold line-clamp-2 min-h-10">
           {provider.bio || 'جاهز لمكالمة سريعة ومباشرة عندما تحتاج جواباً الآن.'}
         </p>
+
+        {provider.matchReason && (
+          <p className="text-[11px] text-teal-700 bg-teal-50 border border-teal-100 rounded-xl px-3 py-2 font-bold leading-relaxed">
+            {provider.matchReason}
+          </p>
+        )}
 
         {settings?.specialtySlugs && settings.specialtySlugs.length > 0 && (
           <div className="flex flex-wrap gap-1.5 min-h-7 overflow-hidden">

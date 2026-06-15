@@ -47,6 +47,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [needPrompt, setNeedPrompt] = useState<string>('');
   const [matchHint, setMatchHint] = useState<string | null>(null);
+  const [smartMatchMode, setSmartMatchMode] = useState(false);
   const [onlineOnly, setOnlineOnly] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   
@@ -63,6 +64,7 @@ export default function App() {
   const [isMicrophoneMuted, setIsMicrophoneMuted] = useState<boolean>(false);
   const [incomingCallRequest, setIncomingCallRequest] = useState<Call | null>(null);
   const [callError, setCallError] = useState<string | null>(null);
+  const [showCallSigninPrompt, setShowCallSigninPrompt] = useState(false);
 
   // Review Form state after calling
   const [summaryCall, setSummaryCall] = useState<Call | null>(null);
@@ -207,10 +209,10 @@ export default function App() {
 
   // --- Poll providers and active profiles ---
   useEffect(() => {
-    if (currentView === 'marketplace') {
+    if (currentView === 'marketplace' && !smartMatchMode) {
       loadMarketplaceProviders();
     }
-  }, [currentView, currentMarketplaceTab, selectedCategory, selectedSpecialty, searchQuery, onlineOnly, selectedLanguage]);
+  }, [currentView, currentMarketplaceTab, selectedCategory, selectedSpecialty, searchQuery, onlineOnly, selectedLanguage, smartMatchMode]);
 
   const loadMarketplaceProviders = () => {
     setLoadingProviders(true);
@@ -368,7 +370,7 @@ export default function App() {
   // Start outgoing call
   const triggerCallToProvider = async (providerId: string) => {
     if (!currentUser) {
-      navigateToSignup('client');
+      setShowCallSigninPrompt(true);
       return;
     }
 
@@ -647,7 +649,7 @@ export default function App() {
     }
   };
 
-  const handleSmartMatch = () => {
+  const handleSmartMatch = async () => {
     const text = needPrompt.trim();
     if (!text) return;
 
@@ -710,20 +712,35 @@ export default function App() {
       }))
       .sort((a, b) => b.score - a.score)[0];
 
-    if (bestMatch && bestMatch.score > 0) {
-      setCurrentMarketplaceTab(bestMatch.tab);
-      setSelectedCategory(bestMatch.category);
-      setSelectedSpecialty('');
-      setMatchHint(bestMatch.hint);
-    } else {
-      setSelectedCategory('');
-      setSelectedSpecialty('');
-      setMatchHint('بحثنا في أسماء وبايو المشاهير والخبراء بناءً على وصفك.');
-    }
+    const inferredTab = bestMatch && bestMatch.score > 0 ? bestMatch.tab : currentMarketplaceTab;
+    const inferredCategory = bestMatch && bestMatch.score > 0 ? bestMatch.category : '';
 
+    setCurrentMarketplaceTab(inferredTab);
+    setSelectedCategory(inferredCategory);
+    setSelectedSpecialty('');
     setSearchQuery(text);
     setOnlineOnly(true);
+    setSmartMatchMode(true);
+    setLoadingProviders(true);
     setCurrentView('marketplace');
+
+    try {
+      const result = await api.matchProviders({
+        prompt: text,
+        providerType: inferredTab,
+        category: inferredCategory,
+        onlineOnly: true,
+        language: selectedLanguage || undefined
+      });
+
+      setProviders(result.providers);
+      setMatchHint(result.summary || (bestMatch?.hint ?? 'رتبنا النتائج بناءً على وصفك ونبذة مقدمي الخدمة.'));
+    } catch (err: any) {
+      setMatchHint(err.message || 'تعذر تشغيل المطابقة الذكية الآن، عرضنا نتائج البحث العادي بدلاً من ذلك.');
+      setSmartMatchMode(false);
+    } finally {
+      setLoadingProviders(false);
+    }
   };
 
 
@@ -880,6 +897,8 @@ export default function App() {
       setNeedPrompt(selectedLandingPreviewCard.reason);
       setSelectedCategory('');
       setSelectedSpecialty('');
+      setSmartMatchMode(false);
+      setMatchHint(null);
     }
 
     setSelectedLandingPreviewCard(null);
@@ -1163,6 +1182,57 @@ export default function App() {
               >
                 <Phone className="w-4 h-4" />
                 طلب مكالمة
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCallSigninPrompt && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4" dir="rtl">
+          <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 p-6 text-right space-y-5">
+            <div className="flex items-start justify-between gap-4">
+              <button
+                type="button"
+                onClick={() => setShowCallSigninPrompt(false)}
+                className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 transition-all"
+                title="إغلاق"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="space-y-2">
+                <div className="bg-teal-50 text-teal-700 w-12 h-12 rounded-2xl flex items-center justify-center mr-auto">
+                  <PhoneCall className="w-6 h-6" />
+                </div>
+                <h3 className="text-xl font-black text-slate-950">سجّل دخولك لطلب المكالمة</h3>
+                <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                  نحتاج حسابك حتى نحجز المكالمة، نحفظ سجلها، ونربطك بمقدم الخدمة بشكل آمن.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCallSigninPrompt(false);
+                  setSignupRolePreset(false);
+                  setAuthMode('login');
+                  setCurrentView('auth');
+                }}
+                className="py-3 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all"
+              >
+                تسجيل الدخول
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCallSigninPrompt(false);
+                  navigateToSignup('client');
+                }}
+                className="py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all"
+              >
+                إنشاء حساب
               </button>
             </div>
           </div>
@@ -1610,6 +1680,8 @@ export default function App() {
                   <button
                     key={tab.id}
                     onClick={() => {
+                      setSmartMatchMode(false);
+                      setMatchHint(null);
                       setCurrentMarketplaceTab(tab.id as 'creator' | 'expert');
                       setSelectedCategory('');
                       setSelectedSpecialty('');
@@ -1692,7 +1764,11 @@ export default function App() {
                   <input 
                     type="text" 
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={e => {
+                      setSmartMatchMode(false);
+                      setMatchHint(null);
+                      setSearchQuery(e.target.value);
+                    }}
                     placeholder={
                       currentMarketplaceTab === 'creator' 
                         ? 'ابحث عن صانع محتوى، ستريمر، كوميديان...' 
@@ -1708,7 +1784,10 @@ export default function App() {
                   {/* Language select */}
                   <select
                     value={selectedLanguage}
-                    onChange={e => setSelectedLanguage(e.target.value)}
+                    onChange={e => {
+                      setSmartMatchMode(false);
+                      setSelectedLanguage(e.target.value);
+                    }}
                     className="bg-white border border-slate-200 py-3 px-4 rounded-xl text-xs font-bold focus:outline-none text-slate-700 min-w-32"
                   >
                     <option value="">جميع اللغات</option>
@@ -1722,7 +1801,10 @@ export default function App() {
                     <input 
                       type="checkbox"
                       checked={onlineOnly}
-                      onChange={e => setOnlineOnly(e.target.checked)}
+                      onChange={e => {
+                        setSmartMatchMode(false);
+                        setOnlineOnly(e.target.checked);
+                      }}
                       className="accent-blue-600 rounded-md w-4 h-4"
                     />
                     <span className="text-xs font-bold text-slate-600">متاح الآن فقط</span>
@@ -1737,7 +1819,7 @@ export default function App() {
                 <label className="text-xs font-extrabold text-slate-500">اختر المسار</label>
                 <div className="flex flex-wrap gap-2">
                   <button 
-                    onClick={() => { setSelectedCategory(''); setSelectedSpecialty(''); }}
+                    onClick={() => { setSmartMatchMode(false); setMatchHint(null); setSelectedCategory(''); setSelectedSpecialty(''); }}
                     className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
                       selectedCategory === '' 
                         ? 'bg-teal-600 border-teal-600 text-white shadow-sm shadow-teal-100' 
@@ -1751,7 +1833,7 @@ export default function App() {
                     .map(sec => (
                       <button 
                         key={sec.slug}
-                        onClick={() => { setSelectedCategory(sec.slug); setSelectedSpecialty(''); }}
+                        onClick={() => { setSmartMatchMode(false); setMatchHint(null); setSelectedCategory(sec.slug); setSelectedSpecialty(''); }}
                         className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
                           selectedCategory === sec.slug 
                             ? 'bg-teal-600 border-teal-600 text-white shadow-sm shadow-teal-100' 
@@ -1771,7 +1853,7 @@ export default function App() {
                   <label className="text-xs font-bold text-teal-600">خصص الطلب:</label>
                   <div className="flex flex-wrap gap-1.5">
                     <button 
-                      onClick={() => setSelectedSpecialty('')}
+                      onClick={() => { setSmartMatchMode(false); setSelectedSpecialty(''); }}
                       className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
                         selectedSpecialty === '' 
                           ? 'bg-teal-50 border-teal-200 text-teal-700 font-extrabold' 
@@ -1783,7 +1865,7 @@ export default function App() {
                     {getSubsectionsList().map(sub => (
                       <button 
                         key={sub.slug}
-                        onClick={() => setSelectedSpecialty(sub.slug)}
+                        onClick={() => { setSmartMatchMode(false); setSelectedSpecialty(sub.slug); }}
                         className={`px-3 py-1 bg-white border rounded-lg text-xs font-semibold transition-all ${
                           selectedSpecialty === sub.slug 
                             ? 'bg-teal-50 border-teal-200 text-teal-700 font-bold' 
@@ -1823,6 +1905,8 @@ export default function App() {
                     setSearchQuery('');
                     setOnlineOnly(false);
                     setSelectedLanguage('');
+                    setSmartMatchMode(false);
+                    setMatchHint(null);
                   }}
                   className="px-4 py-2 bg-blue-50 text-teal-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-colors cursor-pointer"
                 >
