@@ -826,15 +826,15 @@ export default function App() {
           <div className="flex-1 flex flex-col justify-center items-center px-4 py-10 max-w-6xl mx-auto space-y-10">
             
             {/* Hero text */}
-            <div className="text-center space-y-5 max-w-3xl">
+            <div className="text-center space-y-5 max-w-4xl">
               <span className="text-xs font-extrabold tracking-wide text-teal-700 bg-teal-50 border border-teal-100 px-4 py-2 rounded-full inline-flex items-center gap-2">
-                نجمك المفضل. خبيرك الموثوق. في تطبيق واحد.
+                مشاهير وخبراء، جاهزون لمكالمة مباشرة
               </span>
-              <h1 className="text-4xl md:text-6xl font-black text-slate-950 tracking-tight leading-tight">
-                سواء كنت معجباً أو تحتاج مساعدة، <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">الاتصال بخطوة.</span>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.2]">
+                مشهور يلهمك. خبير يساعدك. <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">مكالمة واحدة تكفي.</span>
               </h1>
-              <p className="text-sm md:text-lg text-slate-600 font-semibold leading-relaxed">
-                تواصل مع من يلهمك، أو من يحل مشكلتك. كونكتو يجمع المشاهير والخبراء في تجربة صوتية مباشرة وسريعة.
+              <p className="text-sm md:text-base text-slate-600 font-semibold leading-relaxed max-w-2xl mx-auto">
+                تواصل فوراً مع شخصية تحبها، أو خبير يفهم موقفك. وإذا لديك جمهور أو خبرة، افتح مكتبك واستقبل مكالمات مدفوعة في أي وقت.
               </p>
             </div>
 
