@@ -29,6 +29,7 @@ export default function App() {
   const [signupRole, setSignupRole] = useState<'client' | 'provider'>('client');
   const [signupRolePreset, setSignupRolePreset] = useState(false);
   const [showProviderSignupOptions, setShowProviderSignupOptions] = useState(false);
+  const [landingPreviewFilter, setLandingPreviewFilter] = useState('all');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
@@ -646,6 +647,142 @@ export default function App() {
     { id: 'expert', label: 'تواصل مع خبير', icon: Building }
   ];
 
+  const landingPreviewFilters = [
+    { id: 'all', label: 'الكل' },
+    { id: 'creator', label: 'مشاهير ومؤثرين' },
+    { id: 'legal', label: 'قانون' },
+    { id: 'health', label: 'صحة وأدوية' },
+    { id: 'tech', label: 'تقنية' },
+    { id: 'business-life', label: 'أعمال وحياة' }
+  ];
+
+  const landingPreviewCards = [
+    {
+      name: 'نورة فهد',
+      handle: 'noura_live',
+      group: 'creator',
+      type: 'مشهور / مؤثر',
+      reason: 'مكالمة خاصة، تهنئة، أو سؤال سريع من المتابعين.',
+      price: 75,
+      rating: 4.9,
+      calls: 218,
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=220&h=220&fit=crop',
+      accent: 'amber'
+    },
+    {
+      name: 'كابتن ماجد',
+      handle: 'majed_fit',
+      group: 'creator',
+      type: 'رياضي / صانع محتوى',
+      reason: 'نصيحة تدريب، رسالة تحفيز، أو لقاء سريع مع الجمهور.',
+      price: 60,
+      rating: 4.8,
+      calls: 143,
+      image: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=220&h=220&fit=crop',
+      accent: 'amber'
+    },
+    {
+      name: 'المحامي سامي',
+      handle: 'sami_legal',
+      group: 'legal',
+      type: 'قانون وطوارئ',
+      reason: 'موقف مفاجئ وتحتاج تعرف خطوتك القانونية التالية.',
+      price: 120,
+      rating: 5,
+      calls: 89,
+      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=220&h=220&fit=crop',
+      accent: 'teal'
+    },
+    {
+      name: 'أمل المستشارة',
+      handle: 'amal_family',
+      group: 'legal',
+      type: 'أسرة وعقود',
+      reason: 'استشارة أولية حول عقد، خلاف أسري، أو حقوق موظف.',
+      price: 95,
+      rating: 4.9,
+      calls: 64,
+      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=220&h=220&fit=crop',
+      accent: 'teal'
+    },
+    {
+      name: 'د. لين الصيدلي',
+      handle: 'leen_rx',
+      group: 'health',
+      type: 'صحة وأدوية',
+      reason: 'سؤال عن دواء، أعراض جانبية، أو تداخلات علاجية.',
+      price: 55,
+      rating: 4.9,
+      calls: 172,
+      image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=220&h=220&fit=crop',
+      accent: 'blue'
+    },
+    {
+      name: 'سارة الدعم النفسي',
+      handle: 'sara_calm',
+      group: 'health',
+      type: 'دعم نفسي فوري',
+      reason: 'قلق، ضغط، أو لحظة تحتاج فيها شخصاً يسمعك بهدوء.',
+      price: 70,
+      rating: 4.8,
+      calls: 117,
+      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=220&h=220&fit=crop',
+      accent: 'blue'
+    },
+    {
+      name: 'عمر التقنية',
+      handle: 'omar_fix',
+      group: 'tech',
+      type: 'تقنية وحسابات',
+      reason: 'حساب مخترق، مشكلة جهاز، أو إعداد تطبيق بسرعة.',
+      price: 40,
+      rating: 4.7,
+      calls: 201,
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&h=220&fit=crop',
+      accent: 'slate'
+    },
+    {
+      name: 'مهند السيارات',
+      handle: 'mohanad_auto',
+      group: 'tech',
+      type: 'منزل وسيارة',
+      reason: 'عطل مفاجئ، لمبة محرك، أو رأي قبل شراء سيارة.',
+      price: 45,
+      rating: 4.8,
+      calls: 96,
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=220&h=220&fit=crop',
+      accent: 'slate'
+    },
+    {
+      name: 'ريم الأعمال',
+      handle: 'reem_growth',
+      group: 'business-life',
+      type: 'عمل وأعمال',
+      reason: 'مقابلة، تسعير، فكرة مشروع، أو قرار مهني سريع.',
+      price: 85,
+      rating: 4.9,
+      calls: 132,
+      image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=220&h=220&fit=crop',
+      accent: 'violet'
+    },
+    {
+      name: 'خالد لايف',
+      handle: 'khaled_life',
+      group: 'business-life',
+      type: 'حياة وعلاقات',
+      reason: 'قرار شخصي، تواصل، عادات، أو ترتيب أفكارك الآن.',
+      price: 50,
+      rating: 4.7,
+      calls: 108,
+      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=220&h=220&fit=crop',
+      accent: 'violet'
+    }
+  ];
+
+  const filteredLandingPreviewCards = landingPreviewFilter === 'all'
+    ? landingPreviewCards
+    : landingPreviewCards.filter(card => card.group === landingPreviewFilter);
+
   const getSubsectionsList = () => {
     const selectedSection = sections.find(s => s.slug === selectedCategory);
     return selectedSection?.subsections || [];
@@ -903,62 +1040,46 @@ export default function App() {
             </div>
 
             {/* Marketplace preview cards */}
-            <section className="w-full max-w-6xl space-y-4">
+            <section className="w-full max-w-6xl space-y-5">
               <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 text-right">
                 <div className="space-y-1">
-                  <p className="text-xs font-black text-teal-700">نماذج من السوق</p>
-                  <h2 className="text-2xl md:text-3xl font-black text-slate-950">هكذا تظهر المكالمات المتاحة</h2>
+                  <p className="text-xs font-black text-teal-700">استكشف السوق قبل التسجيل</p>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-950">مشاهير وخبراء جاهزون للمكالمة</h2>
                 </div>
                 <p className="text-xs text-slate-500 font-semibold max-w-md">
-                  مزيج من مشاهير، مؤثرين، وخبراء يستطيع المستخدم الاتصال بهم فوراً، وكل مقدم خدمة يحدد سعره وحالته.
+                  جرّب الفلاتر وشاهد كيف سيظهر مقدمو الخدمة: كل بطاقة تعرض التخصص، السعر، التقييم، وحالة التوفر.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  {
-                    name: 'نورة فهد',
-                    handle: 'noura_live',
-                    type: 'مشهور / مؤثر',
-                    reason: 'مكالمة خاصة، تهنئة، أو سؤال سريع من المتابعين.',
-                    price: 75,
-                    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=220&h=220&fit=crop',
-                    accent: 'amber'
-                  },
-                  {
-                    name: 'المحامي سامي',
-                    handle: 'sami_legal',
-                    type: 'قانون وطوارئ',
-                    reason: 'موقف مفاجئ وتحتاج تعرف خطوتك القانونية التالية.',
-                    price: 120,
-                    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=220&h=220&fit=crop',
-                    accent: 'teal'
-                  },
-                  {
-                    name: 'د. لين الصيدلي',
-                    handle: 'leen_rx',
-                    type: 'صحة وأدوية',
-                    reason: 'سؤال عن دواء، أعراض جانبية، أو تداخلات علاجية.',
-                    price: 55,
-                    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=220&h=220&fit=crop',
-                    accent: 'blue'
-                  },
-                  {
-                    name: 'عمر التقنية',
-                    handle: 'omar_fix',
-                    type: 'تقنية وحسابات',
-                    reason: 'حساب مخترق، مشكلة جهاز، أو إعداد تطبيق بسرعة.',
-                    price: 40,
-                    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&h=220&fit=crop',
-                    accent: 'slate'
-                  }
-                ].map(card => (
-                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4">
+              <div className="flex flex-wrap justify-end gap-2">
+                {landingPreviewFilters.map(filter => {
+                  const active = landingPreviewFilter === filter.id;
+                  return (
+                    <button
+                      key={filter.id}
+                      type="button"
+                      onClick={() => setLandingPreviewFilter(filter.id)}
+                      className={`px-4 py-2 rounded-2xl text-xs font-black border transition-all ${
+                        active
+                          ? 'bg-slate-950 text-white border-slate-950 shadow-sm'
+                          : 'bg-white/90 text-slate-600 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {filteredLandingPreviewCards.map(card => (
+                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4 min-h-[290px]">
                     <div className="flex items-start justify-between gap-3">
                       <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
                         card.accent === 'amber' ? 'bg-amber-50 text-amber-700' :
                         card.accent === 'teal' ? 'bg-teal-50 text-teal-700' :
                         card.accent === 'blue' ? 'bg-blue-50 text-blue-700' :
+                        card.accent === 'violet' ? 'bg-violet-50 text-violet-700' :
                         'bg-slate-100 text-slate-700'
                       }`}>
                         {card.type}
@@ -983,9 +1104,17 @@ export default function App() {
                       {card.reason}
                     </p>
 
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="flex items-center justify-between gap-2 text-[11px] text-slate-500 font-bold">
+                      <span className="inline-flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        {card.rating}
+                      </span>
+                      <span>{card.calls} مكالمة</span>
+                    </div>
+
+                    <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-[10px] text-slate-400 font-bold">السعر التقريبي</p>
+                        <p className="text-[10px] text-slate-400 font-bold">السعر</p>
                         <p className="text-lg font-black text-slate-950">
                           {card.price}
                           <span className="text-[10px] text-slate-500 font-bold"> ر.س/د</span>
@@ -997,6 +1126,16 @@ export default function App() {
                     </div>
                   </article>
                 ))}
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => navigateToSignup('client')}
+                  className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all shadow-sm shadow-teal-100 cursor-pointer"
+                >
+                  ابدأ واتصل بأحدهم
+                </button>
               </div>
             </section>
 
