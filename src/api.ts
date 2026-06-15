@@ -235,7 +235,68 @@ export const api = {
     return providers;
   },
 
-  getProviderProfile: (username: string) => apiRequest<any>(`/marketplace/providers/${username}`),
+  getProviderProfile: async (username: string) => {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('username', username)
+      .eq('role', 'provider')
+      .eq('approved', true)
+      .eq('banned', false)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const { data: settings, error: settingsError } = await supabase
+      .from('provider_settings')
+      .select('*')
+      .eq('user_id', profile.id)
+      .maybeSingle();
+
+    if (settingsError) throw settingsError;
+
+    const { data: reviews, error: reviewsError } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('provider_id', profile.id)
+      .order('created_at', { ascending: false });
+
+    if (reviewsError) throw reviewsError;
+
+    const mappedReviews = (reviews || []).map((review: any) => ({
+      id: review.id,
+      reviewerId: review.reviewer_id,
+      providerId: review.provider_id,
+      callId: review.call_id,
+      rating: review.rating,
+      comment: review.comment || '',
+      createdAt: review.created_at,
+    }));
+
+    const avgRating = mappedReviews.length > 0
+      ? Math.round((mappedReviews.reduce((sum: number, review: any) => sum + review.rating, 0) / mappedReviews.length) * 10) / 10
+      : 5;
+
+    return {
+      ...mapProfile(profile),
+      settings: settings
+        ? {
+            id: settings.id,
+            userId: settings.user_id,
+            providerType: settings.provider_type,
+            availabilityStatus: settings.availability_status,
+            categorySlug: settings.category_slug,
+            specialtySlugs: settings.specialty_slugs || [],
+            languages: settings.languages || ['العربية'],
+            pricePerMinute: Number(settings.price_per_minute || 0),
+            updatedAt: settings.updated_at,
+          }
+        : null,
+      reviews: mappedReviews,
+      avgRating,
+      reviewsCount: mappedReviews.length,
+    };
+  },
 
   getProviderSettings: async (userId: string) => {
     const { data, error } = await supabase
