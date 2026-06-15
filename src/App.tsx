@@ -902,6 +902,104 @@ export default function App() {
 
             </div>
 
+            {/* Marketplace preview cards */}
+            <section className="w-full max-w-6xl space-y-4">
+              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 text-right">
+                <div className="space-y-1">
+                  <p className="text-xs font-black text-teal-700">نماذج من السوق</p>
+                  <h2 className="text-2xl md:text-3xl font-black text-slate-950">هكذا تظهر المكالمات المتاحة</h2>
+                </div>
+                <p className="text-xs text-slate-500 font-semibold max-w-md">
+                  مزيج من مشاهير، مؤثرين، وخبراء يستطيع المستخدم الاتصال بهم فوراً، وكل مقدم خدمة يحدد سعره وحالته.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  {
+                    name: 'نورة فهد',
+                    handle: 'noura_live',
+                    type: 'مشهور / مؤثر',
+                    reason: 'مكالمة خاصة، تهنئة، أو سؤال سريع من المتابعين.',
+                    price: 75,
+                    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=220&h=220&fit=crop',
+                    accent: 'amber'
+                  },
+                  {
+                    name: 'المحامي سامي',
+                    handle: 'sami_legal',
+                    type: 'قانون وطوارئ',
+                    reason: 'موقف مفاجئ وتحتاج تعرف خطوتك القانونية التالية.',
+                    price: 120,
+                    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=220&h=220&fit=crop',
+                    accent: 'teal'
+                  },
+                  {
+                    name: 'د. لين الصيدلي',
+                    handle: 'leen_rx',
+                    type: 'صحة وأدوية',
+                    reason: 'سؤال عن دواء، أعراض جانبية، أو تداخلات علاجية.',
+                    price: 55,
+                    image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=220&h=220&fit=crop',
+                    accent: 'blue'
+                  },
+                  {
+                    name: 'عمر التقنية',
+                    handle: 'omar_fix',
+                    type: 'تقنية وحسابات',
+                    reason: 'حساب مخترق، مشكلة جهاز، أو إعداد تطبيق بسرعة.',
+                    price: 40,
+                    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=220&h=220&fit=crop',
+                    accent: 'slate'
+                  }
+                ].map(card => (
+                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                        card.accent === 'amber' ? 'bg-amber-50 text-amber-700' :
+                        card.accent === 'teal' ? 'bg-teal-50 text-teal-700' :
+                        card.accent === 'blue' ? 'bg-blue-50 text-blue-700' :
+                        'bg-slate-100 text-slate-700'
+                      }`}>
+                        {card.type}
+                      </span>
+                      <div className="relative shrink-0">
+                        <img
+                          src={card.image}
+                          alt={card.name}
+                          referrerPolicy="no-referrer"
+                          className="w-14 h-14 rounded-2xl object-cover border border-slate-200 bg-slate-50"
+                        />
+                        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full border-2 border-white bg-emerald-500" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h3 className="text-base font-black text-slate-950">{card.name}</h3>
+                      <p className="text-[11px] text-slate-400 font-mono" dir="ltr">@{card.handle}</p>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed font-semibold min-h-12">
+                      {card.reason}
+                    </p>
+
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[10px] text-slate-400 font-bold">السعر التقريبي</p>
+                        <p className="text-lg font-black text-slate-950">
+                          {card.price}
+                          <span className="text-[10px] text-slate-500 font-bold"> ر.س/د</span>
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">
+                        متاح الآن
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
           </div>
         )}
 
