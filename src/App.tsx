@@ -27,6 +27,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [signupRole, setSignupRole] = useState<'client' | 'provider'>('client');
+  const [signupRolePreset, setSignupRolePreset] = useState(false);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
@@ -336,11 +337,13 @@ export default function App() {
     setAuthUsername('');
     setAuthFullName('');
     setAuthError(null);
+    setSignupRolePreset(false);
   };
 
   // Navigation Shortcut for landing CTAs
   const navigateToSignup = (role: 'client' | 'provider') => {
     setSignupRole(role);
+    setSignupRolePreset(true);
     setAuthMode('signup');
     setCurrentView('auth');
   };
@@ -743,13 +746,13 @@ export default function App() {
               ) : (
                 <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => { setAuthMode('login'); setCurrentView('auth'); }}
+                    onClick={() => { setSignupRolePreset(false); setAuthMode('login'); setCurrentView('auth'); }}
                     className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                   >
                     تسجيل الدخول
                   </button>
                   <button 
-                    onClick={() => { setAuthMode('signup'); setCurrentView('auth'); }}
+                    onClick={() => { setSignupRolePreset(false); setAuthMode('signup'); setCurrentView('auth'); }}
                     className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-teal-100 cursor-pointer"
                   >
                     ابدأ الآن
@@ -886,7 +889,11 @@ export default function App() {
                 <p className="text-xs text-slate-400 font-medium">
                   {authMode === 'login' 
                     ? 'ادخل لحسابك وكمل من آخر نقطة.' 
-                    : 'اختر هل تريد الاتصال بالآخرين، أم استقبال مكالمات من جمهورك أو عملائك.'}
+                    : signupRolePreset
+                      ? signupRole === 'provider'
+                        ? 'سننشئ لك حساباً لاستقبال المكالمات من جمهورك أو عملائك.'
+                        : 'سننشئ لك حساباً للبحث عن المشاهير والخبراء والاتصال بهم.'
+                      : 'اختر هل تريد الاتصال بالآخرين، أم استقبال مكالمات من جمهورك أو عملائك.'}
                 </p>
               </div>
 
@@ -911,7 +918,7 @@ export default function App() {
               </div>
 
               {/* Role Selection toggles only for new signup */}
-              {authMode === 'signup' && (
+              {authMode === 'signup' && !signupRolePreset && (
                 <div className="space-y-1.5">
                   <label className="text-xs font-extrabold text-slate-500">كيف ستستخدم كونكتو؟</label>
                   <div className="grid grid-cols-2 gap-2">
