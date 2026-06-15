@@ -34,6 +34,7 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
   const [authFullName, setAuthFullName] = useState('');
+  const [authBio, setAuthBio] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -42,6 +43,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [needPrompt, setNeedPrompt] = useState<string>('');
+  const [matchHint, setMatchHint] = useState<string | null>(null);
   const [onlineOnly, setOnlineOnly] = useState<boolean>(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
   
@@ -266,7 +269,8 @@ export default function App() {
         username: authUsername,
         fullName: authFullName,
         role: signupRole,
-        providerType: signupRole === 'provider' ? settingsProviderType : undefined
+        providerType: signupRole === 'provider' ? settingsProviderType : undefined,
+        bio: signupRole === 'provider' ? authBio : undefined
       });
 
       setAuthToken(res.token);
@@ -339,6 +343,7 @@ export default function App() {
     setAuthPassword('');
     setAuthUsername('');
     setAuthFullName('');
+    setAuthBio('');
     setAuthError(null);
     setSignupRolePreset(false);
     setShowProviderSignupOptions(false);
@@ -638,6 +643,85 @@ export default function App() {
     } else {
       setSettingsSpecialties(prev => [...prev, slug]);
     }
+  };
+
+  const handleSmartMatch = () => {
+    const text = needPrompt.trim();
+    if (!text) return;
+
+    const normalized = text.toLowerCase();
+    const matchGroups = [
+      {
+        tab: 'creator' as const,
+        category: 'creators-celebrities',
+        hint: 'بحثنا لك بين المشاهير والمؤثرين بناءً على وصفك.',
+        keywords: ['مشهور', 'مؤثر', 'فنان', 'لاعب', 'يوتيوبر', 'ستريمر', 'تهنئة', 'معجب', 'بودكاست', 'رياضة', 'موسيقى']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'legal',
+        hint: 'يبدو أن موقفك قانوني، لذلك عرضنا خبراء القانون والطوارئ أولاً.',
+        keywords: ['قانون', 'محامي', 'شرطة', 'مضاربة', 'مشكلة', 'قضية', 'عقد', 'بلاغ', 'حادث', 'حقوق', 'مخالفة', 'سجن']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'medical-guidance',
+        hint: 'يبدو أنك تحتاج إرشاداً صحياً أو دوائياً، لذلك عرضنا المختصين الأقرب.',
+        keywords: ['دواء', 'صيدلي', 'طبيب', 'ألم', 'حرارة', 'طفل', 'جلد', 'حساسية', 'أعراض', 'مريض', 'علاج']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'emotional-support',
+        hint: 'يبدو أنك تحتاج دعماً نفسياً أو عاطفياً، لذلك عرضنا المختصين الأقرب.',
+        keywords: ['قلق', 'توتر', 'خوف', 'اكتئاب', 'انفصال', 'علاقة', 'زعل', 'ضغط', 'نفسية', 'وحدة']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'tech-support',
+        hint: 'يبدو أن احتياجك تقني، لذلك عرضنا خبراء التقنية والحسابات.',
+        keywords: ['حساب', 'تهكر', 'مخترق', 'لابتوب', 'جوال', 'راوتر', 'انترنت', 'برمجة', 'موقع', 'تطبيق', 'ذكاء اصطناعي']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'home-car',
+        hint: 'يبدو أن احتياجك متعلق بالمنزل أو السيارة، لذلك عرضنا المختصين المناسبين.',
+        keywords: ['سيارة', 'مكينة', 'بطارية', 'كفر', 'مكيف', 'كهرباء', 'سباكة', 'بيت', 'منزل', 'عطل', 'ميكانيكي']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'career-business',
+        hint: 'يبدو أن احتياجك مهني أو تجاري، لذلك عرضنا خبراء العمل والأعمال.',
+        keywords: ['وظيفة', 'مقابلة', 'راتب', 'سيرة', 'مشروع', 'تسويق', 'مبيعات', 'شركة', 'استثمار', 'عمل']
+      },
+      {
+        tab: 'expert' as const,
+        category: 'life-coaching',
+        hint: 'يبدو أنك تحتاج توجيهاً حياتياً أو قراراً شخصياً، لذلك عرضنا المختصين الأقرب.',
+        keywords: ['قرار', 'حياة', 'عادة', 'تحفيز', 'وقت', 'ثقة', 'تواصل', 'هدف', 'تطوير']
+      }
+    ];
+
+    const bestMatch = matchGroups
+      .map(group => ({
+        ...group,
+        score: group.keywords.reduce((score, keyword) => score + (normalized.includes(keyword) ? 1 : 0), 0)
+      }))
+      .sort((a, b) => b.score - a.score)[0];
+
+    if (bestMatch && bestMatch.score > 0) {
+      setCurrentMarketplaceTab(bestMatch.tab);
+      setSelectedCategory(bestMatch.category);
+      setSelectedSpecialty('');
+      setMatchHint(bestMatch.hint);
+    } else {
+      setSelectedCategory('');
+      setSelectedSpecialty('');
+      setMatchHint('بحثنا في أسماء وبايو المشاهير والخبراء بناءً على وصفك.');
+    }
+
+    setSearchQuery(text);
+    setOnlineOnly(true);
+    setCurrentView('marketplace');
   };
 
 
@@ -1241,6 +1325,45 @@ export default function App() {
                         className="w-full px-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono text-right"
                       />
                     </div>
+
+                    {signupRole === 'provider' && (
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-slate-600">نبذة المطابقة</label>
+                        <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
+                          اكتب ما الذي يعرفك، وما نوع المكالمات التي تريد استقبالها. هذا النص يساعدنا نطابقك مع المستخدم المناسب.
+                        </p>
+                        <div className="bg-teal-50/70 border border-teal-100 rounded-2xl p-3 space-y-2">
+                          <p className="text-[11px] font-black text-teal-700">كيف تكتب نبذة تساعدك تظهر للشخص المناسب؟</p>
+                          <ul className="space-y-1 text-[11px] text-slate-600 font-semibold leading-relaxed list-disc list-inside">
+                            {settingsProviderType === 'creator' ? (
+                              <>
+                                <li>اذكر من أنت: مؤثر، فنان، لاعب، صانع محتوى، أو شخصية عامة.</li>
+                                <li>وضح نوع المكالمات: تهنئة، نصيحة، حديث مع الجمهور، مراجعة محتوى، أو تحفيز.</li>
+                                <li>اكتب الكلمات التي قد يبحث بها المتابع عنك أو عن مجالك.</li>
+                              </>
+                            ) : (
+                              <>
+                                <li>اذكر تخصصك الدقيق وخبرتك، وليس المسمى العام فقط.</li>
+                                <li>اكتب الحالات التي تستطيع مساعدتها: حادث، عقد، دواء، قلق، حساب مخترق، سيارة، مقابلة.</li>
+                                <li>وضح حدود المكالمة: توجيه أولي، خطوة تالية، مراجعة سريعة، أو رأي مهني.</li>
+                              </>
+                            )}
+                          </ul>
+                        </div>
+                        <textarea
+                          required
+                          value={authBio}
+                          onChange={e => setAuthBio(e.target.value)}
+                          rows={4}
+                          placeholder={
+                            settingsProviderType === 'creator'
+                              ? 'مثال: صانع محتوى رياضي، أستقبل مكالمات تهنئة وأسئلة عن التدريب وبناء الجمهور.'
+                              : 'مثال: محامي متخصص في حوادث المرور وعقود العمل، أساعد المستخدم يفهم موقفه والخطوة التالية.'
+                          }
+                          className="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium text-right resize-none"
+                        />
+                      </div>
+                    )}
                   </>
                 )}
 
@@ -1364,6 +1487,56 @@ export default function App() {
 
             {/* Search, Filter box, category filters */}
             <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-6">
+              <div className="rounded-2xl bg-white/85 border border-teal-100 p-4 md:p-5 space-y-3 text-right">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+                  <div className="space-y-1">
+                    <p className="text-[11px] font-black text-teal-700">مطابقة ذكية حسب احتياجك</p>
+                    <h3 className="text-lg font-black text-slate-950">اكتب موقفك، ونقترح لك الشخص الأنسب</h3>
+                    <p className="text-xs text-slate-500 font-semibold leading-relaxed">
+                      لا تحتاج تعرف التصنيف. اكتب ما يحدث معك، وسنبحث في التخصصات والبايو الخاص بالمشاهير والخبراء.
+                    </p>
+                  </div>
+                  {matchHint && (
+                    <span className="bg-teal-50 text-teal-700 border border-teal-100 px-3 py-2 rounded-xl text-[11px] font-black leading-relaxed">
+                      {matchHint}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-2">
+                  <textarea
+                    value={needPrompt}
+                    onChange={e => setNeedPrompt(e.target.value)}
+                    rows={2}
+                    placeholder="مثال: صار لي موقف في الشارع وما أعرف حقي القانوني، أو حسابي انسرق، أو أبي أكلم مؤثر عن مشروع..."
+                    className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/10 focus:border-teal-500 focus:bg-white transition-all text-right resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSmartMatch}
+                    className="md:w-44 px-5 py-3 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all cursor-pointer"
+                  >
+                    طابقني الآن
+                  </button>
+                </div>
+
+                <div className="flex flex-wrap justify-end gap-2">
+                  {[
+                    'تعرضت لمشكلة قانونية وأحتاج محامي الآن',
+                    'حسابي انسرق وأحتاج شخص فاهم تقنية',
+                    'أبي مكالمة قصيرة مع مؤثر أحبه'
+                  ].map(example => (
+                    <button
+                      key={example}
+                      type="button"
+                      onClick={() => setNeedPrompt(example)}
+                      className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 transition-all"
+                    >
+                      {example}
+                    </button>
+                  ))}
+                </div>
+              </div>
               
               {/* Row 1: Search & language */}
               <div className="flex flex-col md:flex-row items-stretch gap-4">
@@ -2154,12 +2327,36 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">نبذة قصيرة</label>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-600">نبذة المطابقة</label>
+                  <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
+                    اكتب بوضوح من أنت، ما الذي تستطيع تقديمه، وما أنواع المكالمات المناسبة لك. سيستخدمها البحث الذكي لمطابقتك مع المستخدم المناسب.
+                  </p>
+                  {currentUser.role === 'provider' && (
+                    <div className="bg-teal-50/70 border border-teal-100 rounded-2xl p-3 space-y-2">
+                      <p className="text-[11px] font-black text-teal-700">اكتبها كأن المستخدم سيصف مشكلته بكلماته</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] text-slate-600 font-semibold leading-relaxed">
+                        <div className="bg-white/70 rounded-xl p-2 border border-teal-100">
+                          <span className="font-black text-slate-800">ضمّن:</span> تخصصك، الحالات التي تناسبك، كلمات البحث المحتملة، والنتيجة التي تقدمها في المكالمة.
+                        </div>
+                        <div className="bg-white/70 rounded-xl p-2 border border-teal-100">
+                          <span className="font-black text-slate-800">تجنب:</span> عبارات عامة مثل “أساعد الجميع” فقط. كن محدداً حتى لا تصلك مكالمات غير مناسبة.
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-500 font-semibold leading-relaxed">
+                        مثال جيد: “محامية متخصصة في حوادث المرور ومشاكل العمل. أساعدك تفهم حقك، ماذا تقول، وما الخطوة التالية قبل التصعيد.”
+                      </p>
+                    </div>
+                  )}
                   <textarea 
                     value={settingsBio}
                     onChange={e => setSettingsBio(e.target.value)}
-                    rows={3}
+                    rows={5}
+                    placeholder={
+                      currentUser.role === 'provider'
+                        ? 'مثال: محامية متخصصة في حوادث المرور وعقود العمل، أساعدك تفهم موقفك والخطوة التالية بسرعة.'
+                        : 'اكتب نبذة قصيرة عنك.'
+                    }
                     className="w-full text-xs font-medium p-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none resize-none"
                   />
                 </div>
