@@ -387,21 +387,140 @@ export const api = {
     };
   },
 
-  createCall: (providerId: string) =>
-    apiRequest<Call>('/calls', {
-      method: 'POST',
-      body: JSON.stringify({ providerId }),
-    }),
+  createCall: async (providerId: string) => {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('غير مسجل الدخول');
 
-  getCalls: () => apiRequest<Call[]>('/calls'),
+    if (authData.user.id === providerId) {
+      throw new Error('لا يمكنك الاتصال بنفس حسابك');
+    }
 
-  getCallById: (id: string) => apiRequest<Call>(`/calls/${id}`),
+    const { data: settings, error: settingsError } = await supabase
+      .from('provider_settings')
+      .select('price_per_minute, availability_status, accepts_instant_calls')
+      .eq('user_id', providerId)
+      .single();
 
-  updateCallStatus: (id: string, status: Call['status'], durationSeconds?: number) =>
-    apiRequest<Call>(`/calls/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status, durationSeconds }),
-    }),
+    if (settingsError) throw settingsError;
+
+    if (settings.availability_status !== 'online' || !settings.accepts_instant_calls) {
+      throw new Error('مزود الخدمة غير متاح للمكالمات الآن');
+    }
+
+    const channelName = `connectoo_${authData.user.id.slice(0, 8)}_${providerId.slice(0, 8)}_${Date.now()}`;
+
+    const { data, error } = await supabase
+      .from('calls')
+      .insert({
+        client_id: authData.user.id,
+        provider_id: providerId,
+        channel_name: channelName,
+        status: 'ringing',
+        price_per_minute: settings.price_per_minute || 0,
+        currency: 'SAR',
+      })
+      .select('*')
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      clientId: data.client_id,
+      providerId: data.provider_id,
+      channelName: data.channel_name,
+      status: data.status,
+      startedAt: data.started_at,
+      endedAt: data.ended_at,
+      durationSeconds: data.duration_seconds,
+      createdAt: data.created_at,
+    };
+  },
+
+  getCalls: async () => {
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('غير مسجل الدخول');
+
+    const { data, error } = await supabase
+      .from('calls')
+      .select('*')
+      .or(`client_id.eq.${authData.user.id},provider_id.eq.${authData.user.id}`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map((call: any) => ({
+      id: call.id,
+      clientId: call.client_id,
+      providerId: call.provider_id,
+      channelName: call.channel_name,
+      status: call.status,
+      startedAt: call.started_at,
+      endedAt: call.ended_at,
+      durationSeconds: call.duration_seconds,
+      createdAt: call.created_at,
+    }));
+  },
+
+  getCallById: async (id: string) => {
+    const { data, error } = await supabase
+      .from('calls')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      clientId: data.client_id,
+      providerId: data.provider_id,
+      channelName: data.channel_name,
+      status: data.status,
+      startedAt: data.started_at,
+      endedAt: data.ended_at,
+      durationSeconds: data.duration_seconds,
+      createdAt: data.created_at,
+    };
+  },
+
+  updateCallStatus: async (id: string, status: Call['status'], durationSeconds?: number) => {
+    const updates: any = { status };
+
+    if (status === 'active') {
+      updates.started_at = new Date().toISOString();
+    }
+
+    if (status === 'completed' || status === 'rejected' || status === 'missed') {
+      updates.ended_at = new Date().toISOString();
+      if (durationSeconds !== undefined) {
+        updates.duration_seconds = durationSeconds;
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('calls')
+      .update(updates)
+      .eq('id', id)
+      .select('*')
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      clientId: data.client_id,
+      providerId: data.provider_id,
+      channelName: data.channel_name,
+      status: data.status,
+      startedAt: data.started_at,
+      endedAt: data.ended_at,
+      durationSeconds: data.duration_seconds,
+      createdAt: data.created_at,
+    };
+  },
 
   getAgoraToken: (callId: string, channelName: string) =>
     apiRequest<{ appId: string; token: string; channelName: string; uid: number }>('/agora/token', {
