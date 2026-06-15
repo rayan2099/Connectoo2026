@@ -10,7 +10,7 @@ import {
   Globe, SlidersHorizontal, Filter, Clock, Plus, X, Menu, Users, Flag, 
   Lock, Unlock, MessageSquare, TrendingUp, BarChart3, Settings2, Sparkles, Building, Check, ArrowRight, Activity
 } from 'lucide-react';
-import { api, getAuthToken, setAuthToken, clearAuthToken, hasAdminPasscode, setAdminPasscode } from './api.js';
+import { api, getAuthToken, setAuthToken, clearAuthToken } from './api.js';
 import { Profile, ProviderSettings, MarketplaceSection, Call, Review, Report, ProviderVerification, MARKETPLACE_SECTIONS_DATA } from './types.js';
 import ExpertDisclaimer from './components/ExpertDisclaimer.js';
 import ProviderCard from './components/ProviderCard.js';
@@ -99,9 +99,6 @@ export default function App() {
   const [adminAnalytics, setAdminAnalytics] = useState<any>(null);
   const [adminActiveTab, setAdminActiveTab] = useState<'approvals' | 'verifications' | 'reports' | 'analytics'>('approvals');
   const [adminLoading, setAdminLoading] = useState(false);
-  const [adminUnlocked, setAdminUnlocked] = useState(hasAdminPasscode());
-  const [adminPasscodeInput, setAdminPasscodeInput] = useState('');
-  const [adminGateError, setAdminGateError] = useState<string | null>(null);
 
   // Intervals and timers refs
   const callTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -318,9 +315,7 @@ export default function App() {
 
       if (res.user.role === 'admin') {
         setCurrentView('admin');
-        if (hasAdminPasscode()) {
-          loadAdminData();
-        }
+        loadAdminData();
       } else if (res.user.role === 'provider') {
         if (!res.user.approved) {
           setCurrentView('pending_approval');
@@ -342,13 +337,9 @@ export default function App() {
   const handleLogout = () => {
     api.logout().then(() => {
       setCurrentUser(null);
-      setAdminUnlocked(false);
-      setAdminPasscodeInput('');
       setCurrentView('landing');
     }).catch(() => {
       setCurrentUser(null);
-      setAdminUnlocked(false);
-      setAdminPasscodeInput('');
       setCurrentView('landing');
     });
   };
@@ -577,10 +568,6 @@ export default function App() {
 
   // Admin Panel Loader
   const loadAdminData = async () => {
-    if (!hasAdminPasscode()) {
-      setAdminUnlocked(false);
-      return;
-    }
 
     setAdminLoading(true);
     try {
@@ -603,31 +590,7 @@ export default function App() {
 
   const openAdminDashboard = () => {
     setCurrentView('admin');
-    setAdminGateError(null);
-
-    if (hasAdminPasscode()) {
-      setAdminUnlocked(true);
-      loadAdminData();
-    }
-  };
-
-  const handleAdminUnlock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAdminGateError(null);
-
-    try {
-      if (!adminPasscodeInput.trim()) {
-        throw new Error('اكتب رمز دخول الإدارة أولاً');
-      }
-
-      await api.unlockAdmin(adminPasscodeInput.trim());
-      setAdminPasscode(adminPasscodeInput.trim());
-      setAdminUnlocked(true);
-      setAdminPasscodeInput('');
-      await loadAdminData();
-    } catch (err: any) {
-      setAdminGateError(err.message);
-    }
+    loadAdminData();
   };
 
   // Admin user approvals / actions
@@ -2766,55 +2729,7 @@ export default function App() {
         )}
 
         {/* 10. SYSTEM ADMINISTRATION OFFICE */}
-        {currentView === 'admin' && currentUser?.role === 'admin' && !adminUnlocked && (
-          <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-14 w-full flex-1">
-            <div className="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-8 text-right space-y-7">
-              <div className="w-16 h-16 rounded-3xl bg-slate-950 text-white flex items-center justify-center mr-auto shadow-lg shadow-slate-200">
-                <Lock className="w-7 h-7" />
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs font-black text-teal-700">منطقة محمية</p>
-                <h2 className="text-3xl font-black text-slate-950">الإدارة</h2>
-                <p className="text-sm leading-7 text-slate-500 font-semibold">
-                  هذه اللوحة مخصصة لحساب الإدارة فقط. حتى بعد تسجيل الدخول، نطلب رمزاً منفصلاً قبل عرض بيانات المستخدمين والبلاغات والتراخيص.
-                </p>
-              </div>
-
-              <form onSubmit={handleAdminUnlock} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-black text-slate-600">رمز دخول الإدارة</label>
-                  <input
-                    type="password"
-                    value={adminPasscodeInput}
-                    onChange={(e) => setAdminPasscodeInput(e.target.value)}
-                    placeholder="اكتب الرمز الخاص بالإدارة"
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-right text-sm font-bold text-slate-800 outline-none focus:border-teal-400 focus:ring-4 focus:ring-teal-50"
-                  />
-                </div>
-
-                {adminGateError && (
-                  <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-xs font-bold text-rose-600">
-                    {adminGateError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full rounded-2xl bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-lg shadow-slate-200 transition hover:bg-slate-800"
-                >
-                  دخول الإدارة
-                </button>
-              </form>
-
-              <p className="text-[11px] leading-6 text-slate-400 font-semibold">
-                الوصول محمي من جهتين: صلاحية الحساب في قاعدة البيانات، ورمز إدارة مخزن كسِرّ على الخادم.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {currentView === 'admin' && currentUser?.role === 'admin' && adminUnlocked && (
+        {currentView === 'admin' && currentUser?.role === 'admin' && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8 flex-1">
             
             <div className="text-right space-y-1 flex justify-between items-center">

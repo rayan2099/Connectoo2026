@@ -51,21 +51,6 @@ export const clearAuthToken = () => {
   localStorage.removeItem('connectoo_token');
 };
 
-export const getAdminPasscode = (): string | null => {
-  return sessionStorage.getItem('connectoo_admin_passcode');
-};
-
-export const setAdminPasscode = (passcode: string) => {
-  sessionStorage.setItem('connectoo_admin_passcode', passcode);
-};
-
-export const clearAdminPasscode = () => {
-  sessionStorage.removeItem('connectoo_admin_passcode');
-};
-
-export const hasAdminPasscode = () => {
-  return Boolean(getAdminPasscode());
-};
 
 // Generic fetch wrapper with Bearer token
 async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -76,12 +61,6 @@ async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}):
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  if (endpoint.startsWith('/admin')) {
-    const adminPasscode = getAdminPasscode();
-    if (adminPasscode) {
-      headers.set('X-Admin-Passcode', adminPasscode);
-    }
-  }
   
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -158,7 +137,6 @@ export const api = {
   logout: async () => {
     await supabase.auth.signOut();
     clearAuthToken();
-    clearAdminPasscode();
     return { success: true };
   },
   
@@ -261,10 +239,6 @@ export const api = {
   }),
 
   // Admin
-  unlockAdmin: (passcode: string) => apiRequest<{ success: boolean }>('/admin/session', {
-    method: 'POST',
-    body: JSON.stringify({ passcode })
-  }),
 
   getAdminUsers: () => apiRequest<Profile[]>('/admin/users'),
   
