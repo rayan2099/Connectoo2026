@@ -24,14 +24,134 @@ async function startServer() {
 
   app.use(express.json());
 
+  const getSupabaseAdminConfig = () => {
+    const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+    if (!url || !serviceRoleKey) {
+      return null;
+    }
+
+    return { url, serviceRoleKey };
+  };
+
+  const mapSupabaseProfile = (row: any) => ({
+    id: row.id,
+    email: row.email || '',
+    username: row.username || '',
+    fullName: row.full_name || row.fullName || '',
+    avatar: row.avatar_url || row.avatar || '',
+    bio: row.bio || '',
+    role: row.role,
+    approved: Boolean(row.approved),
+    verified: Boolean(row.verified),
+    banned: Boolean(row.banned),
+    createdAt: row.created_at || row.createdAt
+  });
+
+  const mapSupabaseVerification = (row: any) => ({
+    id: row.id,
+    providerId: row.user_id || row.provider_id,
+    providerName: row.provider_name,
+    status: row.status,
+    profession: row.profession || '',
+    jurisdiction: row.jurisdiction || '',
+    licenseNumber: row.license_number || row.licenseNumber || '',
+    documentUrl: row.document_url || row.documentUrl || '',
+    notes: row.notes || '',
+    createdAt: row.created_at || row.createdAt,
+    reviewedAt: row.reviewed_at || row.reviewedAt
+  });
+
+  const supabaseRest = async (pathName: string, options: RequestInit = {}) => {
+    const config = getSupabaseAdminConfig();
+    if (!config) {
+      throw new Error('Supabase admin secrets are not configured');
+    }
+
+    const headers = new Headers(options.headers || {});
+    headers.set('apikey', config.serviceRoleKey);
+    headers.set('Authorization', `Bearer ${config.serviceRoleKey}`);
+    if (options.body && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+    if (options.method && options.method !== 'GET' && !headers.has('Prefer')) {
+      headers.set('Prefer', 'return=representation');
+    }
+
+    const response = await fetch(`${config.url}/rest/v1/${pathName}`, {
+      ...options,
+      headers
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(body || `Supabase request failed with ${response.status}`);
+    }
+
+    if (response.status === 204) {
+      return null;
+    }
+
+    return response.json();
+  };
+
+  const resolveSupabaseUserFromToken = async (token: string) => {
+    const config = getSupabaseAdminConfig();
+    if (!config || !token.includes('.')) {
+      return null;
+    }
+
+    const authResponse = await fetch(`${config.url}/auth/v1/user`, {
+      headers: {
+        apikey: config.serviceRoleKey,
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!authResponse.ok) {
+      return null;
+    }
+
+    const authUser = await authResponse.json();
+    if (!authUser?.id) {
+      return null;
+    }
+
+    const rows = await supabaseRest(`profiles?id=eq.${encodeURIComponent(authUser.id)}&select=*`);
+    const profile = Array.isArray(rows) ? rows[0] : null;
+
+    return profile && !profile.banned ? mapSupabaseProfile(profile) : null;
+  };
+
+  const stableAgoraUid = (value: string) => {
+    let hash = 0;
+    for (let i = 0; i < value.length; i += 1) {
+      hash = ((hash * 31) + value.charCodeAt(i)) >>> 0;
+    }
+    return (hash % 2147483000) + 1;
+  };
+
+  const importAgoraAccessToken = async () => {
+    const dynamicImport = new Function('specifier', 'return import(specifier)');
+    return dynamicImport('agora-token');
+  };
+
   // Simple session parsing middleware using a header for maximum reliability in iframes
-  app.use((req: Request, res: Response, next: NextFunction) => {
+  app.use(async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
     if (authHeader && authHeader.startsWith('Bearer ')) {
-      const userId = authHeader.substring(7);
-      const user = dbOperations.getProfileById(userId);
-      if (user && !user.banned) {
-        req.user = user;
+      const token = authHeader.substring(7);
+      const localUser = dbOperations.getProfileById(token);
+
+      if (localUser && !localUser.banned) {
+        req.user = localUser;
+      } else {
+        try {
+          req.user = await resolveSupabaseUserFromToken(token);
+        } catch {
+          req.user = undefined;
+        }
       }
     }
     next();
@@ -482,7 +602,7 @@ async function startServer() {
 
 
   // --- Agora Platform Endpoints ---
-  app.post('/api/agora/token', requireAuth, (req: Request, res: Response) => {
+  app.post('/api/agora/token', requireAuth, async (req: Request, res: Response) => {
     try {
       const { channelName, callId } = req.body;
       if (!channelName || !callId) {
@@ -499,17 +619,40 @@ async function startServer() {
         return res.status(403).json({ error: 'غير مسموح لك بالمشاركة في هذه القناة الصوتية' });
       }
 
-      // Return real architectural payload structured for easy client consumption
-      const appId = 'agora_app_id_connectoo_production_key';
-      const mockToken = `agora_temp_token_${channelName}_${req.user.id}`;
-      const uid = req.user.id === call.clientId ? 1001 : 2002;
+      const appId = process.env.AGORA_APP_ID || process.env.VITE_AGORA_APP_ID;
+      const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+
+      if (!appId || !appCertificate) {
+        return res.status(500).json({ error: 'إعدادات الاتصال الصوتي غير مكتملة على الخادم' });
+      }
+
+      let agoraModule: any;
+      try {
+        agoraModule = await importAgoraAccessToken();
+      } catch {
+        return res.status(500).json({ error: 'مكتبة توليد رموز Agora غير مثبتة على الخادم' });
+      }
+
+      const { RtcTokenBuilder, RtcRole } = agoraModule;
+      const uid = stableAgoraUid(req.user.id);
+      const expiresAt = Math.floor(Date.now() / 1000) + (60 * 60);
+      const token = RtcTokenBuilder.buildTokenWithUid(
+        appId,
+        appCertificate,
+        channelName,
+        uid,
+        RtcRole.PUBLISHER,
+        expiresAt,
+        expiresAt
+      );
 
       res.json({
         appId,
-        token: mockToken,
+        token,
         channelName,
         uid,
-        status: call.status
+        status: call.status,
+        expiresAt
       });
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -593,16 +736,30 @@ async function startServer() {
 
 
   // --- Admin Endpoints ---
-  app.get('/api/admin/users', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.get('/api/admin/users', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest('profiles?select=*&order=created_at.desc');
+        return res.json((rows || []).map(mapSupabaseProfile));
+      }
+
       res.json(dbOperations.getProfiles());
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  app.patch('/api/admin/users/:id/approve', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.patch('/api/admin/users/:id/approve', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest(`profiles?id=eq.${encodeURIComponent(req.params.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ approved: true, banned: false })
+        });
+
+        return res.json(mapSupabaseProfile(rows?.[0]));
+      }
+
       const updated = dbOperations.updateProfile(req.params.id, { approved: true });
       res.json(updated);
     } catch (err: any) {
@@ -610,8 +767,21 @@ async function startServer() {
     }
   });
 
-  app.delete('/api/admin/users/:id/reject', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.delete('/api/admin/users/:id/reject', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest(`profiles?id=eq.${encodeURIComponent(req.params.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ approved: false, banned: true })
+        });
+
+        return res.json({
+          success: true,
+          user: mapSupabaseProfile(rows?.[0]),
+          message: 'تم رفض الحساب وتعطيله.'
+        });
+      }
+
       // Deleting profile or rejecting
       const user = dbOperations.getProfileById(req.params.id);
       if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
@@ -625,9 +795,19 @@ async function startServer() {
     }
   });
 
-  app.patch('/api/admin/users/:id/ban', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.patch('/api/admin/users/:id/ban', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       const { ban } = req.body; // true or false
+
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest(`profiles?id=eq.${encodeURIComponent(req.params.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ banned: ban === true })
+        });
+
+        return res.json(mapSupabaseProfile(rows?.[0]));
+      }
+
       const updated = dbOperations.updateProfile(req.params.id, { banned: ban === true });
       res.json(updated);
     } catch (err: any) {
@@ -648,12 +828,48 @@ async function startServer() {
     }
   });
 
-  app.get('/api/admin/verifications', requireAuth, requireAdmin, (req: Request, res: Response) => {
-    res.json(dbOperations.getVerifications());
+  app.get('/api/admin/verifications', requireAuth, requireAdmin, async (req: Request, res: Response) => {
+    try {
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest('provider_verifications?select=*&order=created_at.desc');
+        return res.json((rows || []).map(mapSupabaseVerification));
+      }
+
+      res.json(dbOperations.getVerifications());
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
-  app.patch('/api/admin/verifications/:id/approve', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.patch('/api/admin/verifications/:id/approve', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
+      if (getSupabaseAdminConfig()) {
+        const existingRows = await supabaseRest(`provider_verifications?id=eq.${encodeURIComponent(req.params.id)}&select=*`);
+        const verification = existingRows?.[0];
+
+        if (!verification) {
+          return res.status(404).json({ error: 'طلب التحقق غير موجود' });
+        }
+
+        const rows = await supabaseRest(`provider_verifications?id=eq.${encodeURIComponent(req.params.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            status: 'approved',
+            reviewed_at: new Date().toISOString()
+          })
+        });
+
+        const providerId = verification.user_id || verification.provider_id;
+        if (providerId) {
+          await supabaseRest(`profiles?id=eq.${encodeURIComponent(providerId)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ verified: true, approved: true })
+          });
+        }
+
+        return res.json(mapSupabaseVerification(rows?.[0]));
+      }
+
       const updated = dbOperations.approveVerification(req.params.id);
       res.json(updated);
     } catch (err: any) {
@@ -661,8 +877,20 @@ async function startServer() {
     }
   });
 
-  app.patch('/api/admin/verifications/:id/reject', requireAuth, requireAdmin, (req: Request, res: Response) => {
+  app.patch('/api/admin/verifications/:id/reject', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
+      if (getSupabaseAdminConfig()) {
+        const rows = await supabaseRest(`provider_verifications?id=eq.${encodeURIComponent(req.params.id)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            status: 'rejected',
+            reviewed_at: new Date().toISOString()
+          })
+        });
+
+        return res.json(mapSupabaseVerification(rows?.[0]));
+      }
+
       const updated = dbOperations.rejectVerification(req.params.id);
       res.json(updated);
     } catch (err: any) {

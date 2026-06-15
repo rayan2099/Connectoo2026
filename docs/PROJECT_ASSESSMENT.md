@@ -84,12 +84,13 @@ Implemented in this pass:
 - Call signin prompt is handled professionally before unauthenticated users can request a call.
 - Local admin approval flow exists for prototype data.
 - Call request, ringing, accept, reject, active, and completed states exist in the prototype backend.
+- Real Agora RTC token endpoint is implemented server-side with `AGORA_APP_CERTIFICATE`.
+- Admin user approval, rejection, ban, and verification approval now use Supabase when `SUPABASE_SERVICE_ROLE_KEY` is configured.
+- Supabase JWT requests can be resolved server-side so admin-only endpoints can work with Supabase Auth sessions.
 
 Still required before production:
 
 - Replace prototype local backend with Supabase-backed endpoints.
-- Connect admin approval to Supabase `profiles` and `provider_verifications`.
-- Generate real Agora RTC tokens using a server-only token library and `AGORA_APP_CERTIFICATE`.
 - Test RLS policies with separate client, provider, and admin accounts.
 
 Deferred by decision:
