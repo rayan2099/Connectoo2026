@@ -630,8 +630,8 @@ export default function App() {
 
   // --- Helper metadata mappings ---
   const marketplaceTabs = [
-    { id: 'creator', label: 'مبدعون مباشر', icon: Sparkles },
-    { id: 'expert', label: 'خبراء الآن', icon: Building }
+    { id: 'creator', label: 'تواصل مع مشهور', icon: Sparkles },
+    { id: 'expert', label: 'تواصل مع خبير', icon: Building }
   ];
 
   const getSubsectionsList = () => {
@@ -835,16 +835,16 @@ export default function App() {
                   <div className="bg-amber-100 p-4 rounded-2xl text-amber-700 w-12 h-12 flex items-center justify-center">
                     <Sparkles className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">مكالمات مع المبدعين</h3>
+                  <h3 className="text-xl font-bold text-gray-900">تواصل مع مشهور</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    مكالمة قصيرة مع شخص تتابعه، سؤال سريع، تهنئة، نصيحة، أو لحظة خاصة بدون انتظار طويل.
+                    تواصل صوتي خاص مع مؤثر، فنان، لاعب، أو شخصية تتابعها. لحظة مباشرة وليست طلب مساعدة.
                   </p>
                 </div>
                 <button 
                   onClick={() => navigateToSignup('client')}
                   className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
-                  شوف المتاحين
+                  شوف المشاهير المتاحين
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
@@ -855,7 +855,7 @@ export default function App() {
                   <div className="bg-teal-100 p-4 rounded-2xl text-teal-700 w-12 h-12 flex items-center justify-center">
                     <Shield className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">مساعدة لحظية من خبير</h3>
+                  <h3 className="text-xl font-bold text-gray-900">تواصل مع خبير</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
                     شارع، سيارة، عقد، دواء، حساب مخترق، قلق مفاجئ. اختر القسم المناسب وتحدث مع شخص يفهم الموقف فوراً.
                   </p>
@@ -864,7 +864,7 @@ export default function App() {
                   onClick={() => navigateToSignup('client')}
                   className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm shadow-teal-100 cursor-pointer"
                 >
-                  أحتاج خبيراً الآن
+                  شوف الخبراء المتاحين
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
@@ -1921,8 +1921,8 @@ export default function App() {
                           onChange={e => setSettingsProviderType(e.target.value as 'creator' | 'expert')}
                           className="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-lg"
                         >
-                          <option value="creator">مبدعون مباشر (موسيقى، رياضة، يوتيوب)</option>
-                          <option value="expert">خبير استشاري (قانون، طب، تقنية، أعمال، ميكانيكا)</option>
+                          <option value="creator">مبدع أو شخصية عامة</option>
+                          <option value="expert">خبير جاهز للاستشارة</option>
                         </select>
                       </div>
 
@@ -1949,14 +1949,14 @@ export default function App() {
                           onChange={e => setSettingsCategory(e.target.value)}
                           className="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-lg"
                         >
-                          <option value="creators-celebrities">مبدعون مباشر</option>
-                          <option value="legal">القانون والشرائع</option>
-                          <option value="emotional-support">الدعم النفسي والاجتماعي</option>
-                          <option value="medical-guidance">الإرشاد الصيدلاني والطبي</option>
-                          <option value="career-business">المهنة والأعمال التجارية</option>
-                          <option value="tech-support">الدعم الفني والبرمجة والشبكات</option>
-                          <option value="home-car">صيانة المنزل والسيارة</option>
-                          <option value="life-coaching">توجيه الحياة وتطوير العادات</option>
+                          <option value="creators-celebrities">لقاءات المبدعين</option>
+                          <option value="legal">قانون وطوارئ</option>
+                          <option value="emotional-support">دعم نفسي فوري</option>
+                          <option value="medical-guidance">صحة وأدوية</option>
+                          <option value="career-business">عمل وأعمال</option>
+                          <option value="tech-support">تقنية وحسابات</option>
+                          <option value="home-car">منزل وسيارة</option>
+                          <option value="life-coaching">حياة وعلاقات</option>
                         </select>
                       </div>
 
@@ -1990,7 +1990,7 @@ export default function App() {
 
                     {/* Specialty Checklist */}
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-600">اختر ما تستطيع مساعدتهم فيه</label>
+                      <label className="text-xs font-bold text-slate-600">اختر نوع المكالمات التي تستقبلها</label>
                       <div className="flex flex-wrap gap-2">
                         {/* Dynamically list matching subsections from our constant file */}
                         {MARKETPLACE_SECTIONS_DATA.find(s => s.slug === settingsCategory)?.subsections?.map(sub => {
