@@ -169,7 +169,7 @@ export const api = {
     }));
   },
 
-  getProviders: (filters: {
+  getProviders: async (filters: {
     providerType?: string;
     category?: string;
     specialty?: string;
@@ -177,15 +177,62 @@ export const api = {
     onlineOnly?: boolean;
     language?: string;
   } = {}) => {
-    const params = new URLSearchParams();
-    if (filters.providerType) params.append('providerType', filters.providerType);
-    if (filters.category) params.append('category', filters.category);
-    if (filters.specialty) params.append('specialty', filters.specialty);
-    if (filters.search) params.append('search', filters.search);
-    if (filters.onlineOnly) params.append('onlineOnly', 'true');
-    if (filters.language) params.append('language', filters.language);
+    let query = supabase
+      .from('provider_settings')
+      .select('*, profiles!inner(*)')
+      .eq('profiles.role', 'provider')
+      .eq('profiles.approved', true)
+      .eq('profiles.banned', false);
 
-    return apiRequest<any[]>(`/marketplace/providers?${params.toString()}`);
+    if (filters.providerType) query = query.eq('provider_type', filters.providerType);
+    if (filters.category) query = query.eq('category_slug', filters.category);
+    if (filters.specialty) query = query.contains('specialty_slugs', [filters.specialty]);
+    if (filters.onlineOnly) query = query.eq('availability_status', 'online');
+    if (filters.language) query = query.contains('languages', [filters.language]);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    let providers = (data || []).map((row: any) => {
+      const profile = row.profiles;
+      return {
+        id: profile.id,
+        email: profile.email || '',
+        username: profile.username,
+        fullName: profile.full_name,
+        avatar: profile.avatar_url || '',
+        bio: profile.bio || '',
+        role: profile.role,
+        approved: profile.approved,
+        verified: profile.verified,
+        banned: profile.banned,
+        createdAt: profile.created_at,
+        settings: {
+          id: row.id,
+          userId: row.user_id,
+          providerType: row.provider_type,
+          availabilityStatus: row.availability_status,
+          categorySlug: row.category_slug,
+          specialtySlugs: row.specialty_slugs || [],
+          languages: row.languages || ['العربية'],
+          pricePerMinute: Number(row.price_per_minute || 0),
+          updatedAt: row.updated_at,
+        },
+        avgRating: 5,
+        reviewsCount: 0,
+      };
+    });
+
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      providers = providers.filter((provider: any) =>
+        provider.fullName.toLowerCase().includes(q) ||
+        provider.username.toLowerCase().includes(q) ||
+        provider.bio.toLowerCase().includes(q)
+      );
+    }
+
+    return providers;
   },
 
   getProviderProfile: (username: string) => apiRequest<any>(`/marketplace/providers/${username}`),
