@@ -24,6 +24,30 @@ async function startServer() {
 
   app.use(express.json());
 
+  const getAdminEmail = () => (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+
+  const getAdminPasscode = () => process.env.ADMIN_PASSCODE || '';
+
+  const isAllowedAdminUser = (user: any) => {
+    const adminEmail = getAdminEmail();
+
+    return Boolean(
+      adminEmail
+      && user
+      && user.role === 'admin'
+      && user.approved !== false
+      && user.banned !== true
+      && String(user.email || '').trim().toLowerCase() === adminEmail
+    );
+  };
+
+  const hasValidAdminPasscode = (req: Request) => {
+    const configuredPasscode = getAdminPasscode();
+    const providedPasscode = String(req.headers['x-admin-passcode'] || req.body?.passcode || '');
+
+    return Boolean(configuredPasscode && providedPasscode === configuredPasscode);
+  };
+
   const getSupabaseAdminConfig = () => {
     const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -169,9 +193,14 @@ async function startServer() {
   };
 
   const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user || req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'عذراً، هذه الصلاحية تقتصر على مدراء النظام فقط' });
+    if (!isAllowedAdminUser(req.user)) {
+      return res.status(403).json({ error: 'عذراً، لوحة الإدارة متاحة فقط لحساب الإدارة المعتمد' });
     }
+
+    if (!hasValidAdminPasscode(req)) {
+      return res.status(403).json({ error: 'رمز دخول الإدارة غير صحيح أو غير مفعّل' });
+    }
+
     next();
   };
 
@@ -186,6 +215,10 @@ async function startServer() {
 
       if (!['client', 'provider', 'admin'].includes(role)) {
         return res.status(400).json({ error: 'نوع الحساب غير صالح' });
+      }
+
+      if (role === 'admin') {
+        return res.status(403).json({ error: 'لا يمكن إنشاء حساب إدارة من التسجيل العام' });
       }
 
       // Check if username already exists
@@ -736,6 +769,18 @@ async function startServer() {
 
 
   // --- Admin Endpoints ---
+  app.post('/api/admin/session', requireAuth, (req: Request, res: Response) => {
+    if (!isAllowedAdminUser(req.user)) {
+      return res.status(403).json({ error: 'هذا الحساب غير مصرح له بدخول الإدارة' });
+    }
+
+    if (!hasValidAdminPasscode(req)) {
+      return res.status(403).json({ error: 'رمز دخول الإدارة غير صحيح' });
+    }
+
+    res.json({ success: true });
+  });
+
   app.get('/api/admin/users', requireAuth, requireAdmin, async (req: Request, res: Response) => {
     try {
       if (getSupabaseAdminConfig()) {

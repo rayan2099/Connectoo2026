@@ -20,6 +20,22 @@ export const clearAuthToken = () => {
   localStorage.removeItem('connectoo_token');
 };
 
+export const getAdminPasscode = (): string | null => {
+  return sessionStorage.getItem('connectoo_admin_passcode');
+};
+
+export const setAdminPasscode = (passcode: string) => {
+  sessionStorage.setItem('connectoo_admin_passcode', passcode);
+};
+
+export const clearAdminPasscode = () => {
+  sessionStorage.removeItem('connectoo_admin_passcode');
+};
+
+export const hasAdminPasscode = () => {
+  return Boolean(getAdminPasscode());
+};
+
 // Generic fetch wrapper with Bearer token
 async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getAuthToken();
@@ -27,6 +43,13 @@ async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}):
   
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  if (endpoint.startsWith('/admin')) {
+    const adminPasscode = getAdminPasscode();
+    if (adminPasscode) {
+      headers.set('X-Admin-Passcode', adminPasscode);
+    }
   }
   
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
@@ -64,6 +87,7 @@ export const api = {
   
   logout: () => {
     clearAuthToken();
+    clearAdminPasscode();
     return apiRequest('/auth/logout', { method: 'POST' });
   },
   
@@ -159,6 +183,11 @@ export const api = {
   }),
 
   // Admin
+  unlockAdmin: (passcode: string) => apiRequest<{ success: boolean }>('/admin/session', {
+    method: 'POST',
+    body: JSON.stringify({ passcode })
+  }),
+
   getAdminUsers: () => apiRequest<Profile[]>('/admin/users'),
   
   approveUser: (id: string) => apiRequest<Profile>(`/admin/users/${id}/approve`, { method: 'PATCH' }),
