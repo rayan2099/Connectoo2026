@@ -4,8 +4,39 @@
  */
 
 import { Profile, ProviderSettings, MarketplaceSection, Call, Review, Report, ProviderVerification, Payment } from './types.js';
+import { supabase } from './lib/supabase.js';
 
 const API_BASE = '/api';
+
+function mapProfile(row: any): Profile {
+  return {
+    id: row.id,
+    email: row.email || '',
+    username: row.username || '',
+    fullName: row.full_name || row.fullName || '',
+    avatar: row.avatar_url || row.avatar || '',
+    bio: row.bio || '',
+    role: row.role,
+    approved: Boolean(row.approved),
+    verified: Boolean(row.verified),
+    banned: Boolean(row.banned),
+    createdAt: row.created_at || row.createdAt || new Date().toISOString(),
+  };
+}
+
+async function getProfileForUser(userId: string): Promise<Profile> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return mapProfile(data);
+}
 
 // Simple token storage
 export const getAuthToken = (): string | null => {
@@ -75,23 +106,70 @@ async function apiRequest<T = any>(endpoint: string, options: RequestInit = {}):
 
 export const api = {
   // Auth
-  signup: (body: any) => apiRequest<{ user: Profile; token: string }>('/auth/signup', {
-    method: 'POST',
-    body: JSON.stringify(body)
-  }),
-  
-  login: (body: any) => apiRequest<{ user: Profile; token: string }>('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(body)
-  }),
-  
-  logout: () => {
-    clearAuthToken();
-    clearAdminPasscode();
-    return apiRequest('/auth/logout', { method: 'POST' });
+  signup: async (body: any) => {
+    const { data, error } = await supabase.auth.signUp({
+      email: body.email,
+      password: body.password,
+      options: {
+        data: {
+          username: body.username,
+          full_name: body.fullName,
+          role: body.role,
+          provider_type: body.providerType,
+          bio: body.bio,
+        },
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data.user) {
+      throw new Error('لم نتمكن من إنشاء الحساب في Supabase');
+    }
+
+    if (!data.session?.access_token) {
+      throw new Error('تم إنشاء الحساب. الرجاء تأكيد البريد الإلكتروني ثم تسجيل الدخول.');
+    }
+
+    const user = await getProfileForUser(data.user.id);
+    return { user, token: data.session.access_token };
   },
   
-  me: () => apiRequest<{ user: Profile }>('/auth/me'),
+  login: async (body: any) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: body.email,
+      password: body.password,
+    });
+
+    if (error) {
+      throw new Error('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+    }
+
+    if (!data.session?.access_token || !data.user) {
+      throw new Error('تعذر فتح جلسة الدخول');
+    }
+
+    const user = await getProfileForUser(data.user.id);
+    return { user, token: data.session.access_token };
+  },
+  
+  logout: async () => {
+    await supabase.auth.signOut();
+    clearAuthToken();
+    clearAdminPasscode();
+    return { success: true };
+  },
+  
+  me: async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session?.access_token) {
+      setAuthToken(sessionData.session.access_token);
+    }
+
+    return apiRequest<{ user: Profile }>('/auth/me');
+  },
 
   // Marketplace
   getSections: () => apiRequest<MarketplaceSection[]>('/marketplace/sections'),
