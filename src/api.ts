@@ -237,13 +237,94 @@ export const api = {
 
   getProviderProfile: (username: string) => apiRequest<any>(`/marketplace/providers/${username}`),
 
-  getProviderSettings: (userId: string) => apiRequest<ProviderSettings>(`/provider-settings/${userId}`),
+  getProviderSettings: async (userId: string) => {
+    const { data, error } = await supabase
+      .from('provider_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
 
-  updateProviderSettings: (userId: string, body: any) =>
-    apiRequest<{ settings: ProviderSettings; user: Profile }>(`/provider-settings/${userId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-    }),
+    if (error) throw error;
+    if (!data) return null as any;
+
+    return {
+      id: data.id,
+      userId: data.user_id,
+      providerType: data.provider_type,
+      availabilityStatus: data.availability_status,
+      categorySlug: data.category_slug,
+      specialtySlugs: data.specialty_slugs || [],
+      languages: data.languages || ['العربية'],
+      pricePerMinute: Number(data.price_per_minute || 0),
+      updatedAt: data.updated_at,
+    };
+  },
+
+  updateProviderSettings: async (userId: string, body: any) => {
+    const profileUpdates: any = {};
+    if (body.fullName !== undefined) profileUpdates.full_name = body.fullName;
+    if (body.bio !== undefined) profileUpdates.bio = body.bio;
+    if (body.avatar !== undefined) profileUpdates.avatar_url = body.avatar;
+
+    if (Object.keys(profileUpdates).length > 0) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update(profileUpdates)
+        .eq('id', userId);
+
+      if (profileError) throw profileError;
+    }
+
+    const settingsUpdates: any = {};
+    if (body.providerType !== undefined) settingsUpdates.provider_type = body.providerType;
+    if (body.availabilityStatus !== undefined) settingsUpdates.availability_status = body.availabilityStatus;
+    if (body.categorySlug !== undefined) settingsUpdates.category_slug = body.categorySlug;
+    if (body.specialtySlugs !== undefined) settingsUpdates.specialty_slugs = body.specialtySlugs;
+    if (body.languages !== undefined) settingsUpdates.languages = body.languages;
+    if (body.pricePerMinute !== undefined) settingsUpdates.price_per_minute = body.pricePerMinute;
+
+    const { data: settingsRow, error: settingsError } = await supabase
+      .from('provider_settings')
+      .upsert(
+        {
+          user_id: userId,
+          provider_type: settingsUpdates.provider_type || 'creator',
+          category_slug: settingsUpdates.category_slug || 'creators-celebrities',
+          specialty_slugs: settingsUpdates.specialty_slugs || [],
+          languages: settingsUpdates.languages || ['العربية'],
+          price_per_minute: settingsUpdates.price_per_minute ?? 10,
+          ...settingsUpdates,
+        },
+        { onConflict: 'user_id' }
+      )
+      .select('*')
+      .single();
+
+    if (settingsError) throw settingsError;
+
+    const { data: profileRow, error: profileLoadError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (profileLoadError) throw profileLoadError;
+
+    return {
+      settings: {
+        id: settingsRow.id,
+        userId: settingsRow.user_id,
+        providerType: settingsRow.provider_type,
+        availabilityStatus: settingsRow.availability_status,
+        categorySlug: settingsRow.category_slug,
+        specialtySlugs: settingsRow.specialty_slugs || [],
+        languages: settingsRow.languages || ['العربية'],
+        pricePerMinute: Number(settingsRow.price_per_minute || 0),
+        updatedAt: settingsRow.updated_at,
+      },
+      user: mapProfile(profileRow),
+    };
+  },
 
   createCall: (providerId: string) =>
     apiRequest<Call>('/calls', {
