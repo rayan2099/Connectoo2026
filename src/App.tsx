@@ -604,7 +604,7 @@ export default function App() {
   };
 
   const handleAdminRejectUser = async (id: string) => {
-    if (!window.confirm('هل تريد رفض وإلغاء طلب هذا المستخدم؟')) return;
+    if (!window.confirm('هل تريد رفض الطلب طلب هذا المستخدم؟')) return;
     try {
       await api.rejectUser(id);
       loadAdminData();
@@ -1296,9 +1296,9 @@ export default function App() {
                   <div className="bg-amber-100 p-4 rounded-2xl text-amber-700 w-12 h-12 flex items-center justify-center">
                     <Sparkles className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">أريد استقبال مكالمات</h3>
+                  <h3 className="text-xl font-bold text-gray-900">أريد استقبال المكالمات</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    للمشاهير، المؤثرين، والخبراء: أنشئ مكتبك، حدد سعرك، وافتح حالتك ليستطيع الناس الاتصال بك فوراً.
+                    للمشاهير والخبراء: أنشئ ملفك، حدد سعرك، وافتح حالتك ليستطيع الناس الاتصال بك مباشرة.
                   </p>
                 </div>
                 {showProviderSignupOptions ? (
@@ -1323,7 +1323,7 @@ export default function App() {
                     onClick={() => setShowProviderSignupOptions(true)}
                     className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
-                    افتح مكتبك الآن
+                    ابدأ استقبال المكالمات
                     <ArrowRight className="w-4 h-4 rotate-180" />
                   </button>
                 )}
@@ -2233,7 +2233,7 @@ export default function App() {
               <div className="bg-white border border-slate-100 p-5 rounded-3xl shadow-xs space-y-2">
                 <p className="text-xs font-bold text-slate-400">مسارك</p>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-slate-600 inline-block">
-                  {settingsProviderType === 'creator' ? 'مبدع / صانع محتوى' : 'خبير معتمد'}
+                  {settingsProviderType === 'creator' ? 'مشهور / مؤثر' : 'خبير معتمد'}
                 </span>
               </div>
 
@@ -2734,8 +2734,8 @@ export default function App() {
             
             <div className="text-right space-y-1 flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">لوحة تحكم كونكتو</h2>
-                <p className="text-xs text-slate-400 font-medium">مراجعة الحسابات، التوثيق، البلاغات، ومؤشرات التشغيل.</p>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">إدارة كونكتو</h2>
+                <p className="text-xs text-slate-400 font-medium">إدارة طلبات الانضمام، توثيق الخبراء، البلاغات، ومؤشرات المنصة.</p>
               </div>
               <button 
                 onClick={loadAdminData}
@@ -2753,7 +2753,7 @@ export default function App() {
                   adminActiveTab === 'approvals' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                طلبات العضوية للمشاهير والخبراء ({adminUsers.filter(u => !u.approved).length})
+                طلبات انضمام المشاهير والخبراء ({adminUsers.filter(u => !u.approved).length})
               </button>
               <button 
                 onClick={() => setAdminActiveTab('verifications')}
@@ -2761,7 +2761,7 @@ export default function App() {
                   adminActiveTab === 'verifications' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                رخص التوثيق المهني ({adminVerifications.filter(v => v.status === 'pending').length})
+                توثيق الخبراء المهني ({adminVerifications.filter(v => v.status === 'pending').length})
               </button>
               <button 
                 onClick={() => setAdminActiveTab('reports')}
@@ -2796,8 +2796,8 @@ export default function App() {
                     <div className="space-y-4">
                       
                       <div className="flex justify-between items-center">
-                        <h3 className="font-extrabold text-slate-800 text-sm">طلبات العضوية وتأهيل حسابات المشاهير والخبراء الجدد</h3>
-                        <span className="text-slate-400 text-xs font-medium">المشاهير والخبراء الجدد لا يظهرون في السوق إلا بعد موافقة الإدارة.</span>
+                        <h3 className="font-extrabold text-slate-800 text-sm">مراجعة حسابات المشاهير والخبراء الجدد</h3>
+                        <span className="text-slate-400 text-xs font-medium">كل مشهور أو خبير جديد يبقى مخفياً حتى توافق عليه الإدارة.</span>
                       </div>
 
                       <div className="overflow-x-auto">
@@ -2805,16 +2805,16 @@ export default function App() {
                           <thead className="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
                             <tr>
                               <th className="p-3">صورة العرض</th>
-                              <th className="p-3">الاسم بالكامل / المعرّف</th>
+                              <th className="p-3">الاسم / المعرّف</th>
                               <th className="p-3">البريد الإلكتروني</th>
-                              <th className="p-3">الدخول الأولي</th>
-                              <th className="p-3 text-left">التوجيه الإجرائي</th>
+                              <th className="p-3">حالة الظهور</th>
+                              <th className="p-3 text-left">الإجراء</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
                             {adminUsers.filter(u => u.role === 'provider').length === 0 ? (
                               <tr>
-                                <td colSpan={5} className="p-8 text-center text-slate-400">لا توجد حالياً طلبات عضوية معلقة للمشاهير أو الخبراء.</td>
+                                <td colSpan={5} className="p-8 text-center text-slate-400">لا توجد حالياً طلبات انضمام معلقة للمشاهير أو الخبراء.</td>
                               </tr>
                             ) : (
                               adminUsers.filter(u => u.role === 'provider').map(u => (
@@ -2829,7 +2829,7 @@ export default function App() {
                                   <td className="p-3">{u.email}</td>
                                   <td className="p-3">
                                     <span className={`px-2 py-0.5 rounded text-[10px] ${u.approved ? 'bg-green-50 text-green-600' : 'bg-rose-50 text-rose-600'}`}>
-                                      {u.approved ? 'حساب معتمد للخدمة' : 'عضو خامل معلق للتصريح'}
+                                      {u.approved ? 'ظاهر في السوق' : 'بانتظار الموافقة'}
                                     </span>
                                   </td>
                                   <td className="p-3 text-left space-x-2 space-x-reverse">
@@ -2838,14 +2838,14 @@ export default function App() {
                                         onClick={() => handleAdminApproveUser(u.id)}
                                         className="py-1 px-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-[10px] font-bold transition cursor-pointer"
                                       >
-                                        موافقة وترخيص
+                                        اعتماد الحساب
                                       </button>
                                     )}
                                     <button 
                                       onClick={() => handleAdminRejectUser(u.id)}
                                       className="py-1 px-3 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded text-[10px] font-bold transition cursor-pointer"
                                     >
-                                      رفض وإلغاء
+                                      رفض الطلب
                                     </button>
                                     <button 
                                       onClick={() => handleAdminBanToggle(u.id, u.banned)}
@@ -2855,7 +2855,7 @@ export default function App() {
                                           : 'bg-rose-600 hover:bg-rose-700 text-white'
                                       }`}
                                     >
-                                      {u.banned ? 'فك الحظر' : 'حظر نهائي'}
+                                      {u.banned ? 'فك الحظر' : 'حظر الحساب'}
                                     </button>
                                   </td>
                                 </tr>
@@ -2873,26 +2873,26 @@ export default function App() {
                     <div className="space-y-4">
                       
                       <div className="flex justify-between items-center">
-                        <h3 className="font-extrabold text-slate-800 text-sm">مراجعة تراخيص مزاولة المهن وإثباتات الهوية والترخيص</h3>
-                        <span className="text-slate-400 text-xs font-medium">التحقق من الرخص يمنح حساب الخبير شارة زرقاء معتمدة لإشاعة الطمأنينة.</span>
+                        <h3 className="font-extrabold text-slate-800 text-sm">مراجعة تراخيص الخبراء وإثباتاتهم المهنية</h3>
+                        <span className="text-slate-400 text-xs font-medium">اعتماد الترخيص يمنح الخبير شارة موثّق ويزيد ثقة المستخدمين.</span>
                       </div>
 
                       <div className="overflow-x-auto">
                         <table className="w-full text-right text-xs">
                           <thead className="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
                             <tr>
-                              <th className="p-3">اسم المستشار</th>
-                              <th className="p-3">المهنة المصرح بها</th>
-                              <th className="p-3">رقم الرخصة الملحق</th>
-                              <th className="p-3">جهة الاختصاص والبلد</th>
+                              <th className="p-3">اسم الخبير</th>
+                              <th className="p-3">التخصص المهني</th>
+                              <th className="p-3">رقم الرخصة</th>
+                              <th className="p-3">جهة الترخيص / البلد</th>
                               <th className="p-3">حالة الطلب</th>
-                              <th className="p-3 text-left">التدابير المتاحة</th>
+                              <th className="p-3 text-left">الإجراء</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
                             {adminVerifications.length === 0 ? (
                               <tr>
-                                <td colSpan={6} className="p-8 text-center text-slate-400">لا يوجد أي طلبات تدقيق رخص مهنية مرفوعة حالياً من الخبراء.</td>
+                                <td colSpan={6} className="p-8 text-center text-slate-400">لا توجد حالياً طلبات توثيق مهني من الخبراء.</td>
                               </tr>
                             ) : (
                               adminVerifications.map(v => (
@@ -2905,7 +2905,7 @@ export default function App() {
                                     <span className={`px-2 py-0.5 rounded text-[10px] ${
                                       v.status === 'approved' ? 'bg-green-50 text-green-600' : v.status === 'rejected' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'
                                     }`}>
-                                      {v.status === 'approved' ? 'تم الاعتماد والتوثيق' : v.status === 'rejected' ? 'مرفوض ومستبعد' : 'طلب قيد المراجعة الفنية'}
+                                      {v.status === 'approved' ? 'موثّق' : v.status === 'rejected' ? 'مرفوض' : 'بانتظار المراجعة'}
                                     </span>
                                   </td>
                                   <td className="p-3 text-left space-x-2 space-x-reverse">
@@ -2915,7 +2915,7 @@ export default function App() {
                                           onClick={() => handleAdminApproveVerify(v.id)}
                                           className="py-1 px-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded text-[10px] font-bold transition cursor-pointer"
                                         >
-                                          اعتماد الرخصة
+                                          توثيق الخبير
                                         </button>
                                         <button 
                                           onClick={() => handleAdminRejectVerify(v.id)}
