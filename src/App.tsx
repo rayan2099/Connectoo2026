@@ -1328,9 +1328,9 @@ export default function App() {
 
                     {signupRole === 'provider' && (
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-600">نبذة المطابقة</label>
+                        <label className="text-xs font-bold text-slate-600">عرّف الناس عليك</label>
                         <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
-                          اكتب ما الذي يعرفك، وما نوع المكالمات التي تريد استقبالها. هذا النص يساعدنا نطابقك مع المستخدم المناسب.
+                          اكتب وصفاً قصيراً يشرح من أنت، ما الذي تقدمه، ولمن تناسب مكالماتك. كلما كان وصفك واضحاً، وصل إليك الشخص الأنسب.
                         </p>
                         <div className="bg-teal-50/70 border border-teal-100 rounded-2xl p-3 space-y-2">
                           <p className="text-[11px] font-black text-teal-700">كيف تكتب نبذة تساعدك تظهر للشخص المناسب؟</p>
@@ -2328,13 +2328,13 @@ export default function App() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-600">نبذة المطابقة</label>
+                  <label className="text-xs font-bold text-slate-600">عرّف الناس عليك</label>
                   <p className="text-[11px] text-slate-400 font-semibold leading-relaxed">
-                    اكتب بوضوح من أنت، ما الذي تستطيع تقديمه، وما أنواع المكالمات المناسبة لك. سيستخدمها البحث الذكي لمطابقتك مع المستخدم المناسب.
+                    هذا هو النص الذي يقرأه المستخدم والبحث الذكي معاً. عرّف بنفسك، وضّح خبرتك أو حضورك، واكتب الحالات أو المواضيع التي تحب استقبال مكالمات عنها.
                   </p>
                   {currentUser.role === 'provider' && (
                     <div className="bg-teal-50/70 border border-teal-100 rounded-2xl p-3 space-y-2">
-                      <p className="text-[11px] font-black text-teal-700">اكتبها كأن المستخدم سيصف مشكلته بكلماته</p>
+                      <p className="text-[11px] font-black text-teal-700">اجعل وصفك قابلاً للاكتشاف</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] text-slate-600 font-semibold leading-relaxed">
                         <div className="bg-white/70 rounded-xl p-2 border border-teal-100">
                           <span className="font-black text-slate-800">ضمّن:</span> تخصصك، الحالات التي تناسبك، كلمات البحث المحتملة، والنتيجة التي تقدمها في المكالمة.
