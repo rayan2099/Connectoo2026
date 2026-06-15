@@ -630,8 +630,8 @@ export default function App() {
 
   // --- Helper metadata mappings ---
   const marketplaceTabs = [
-    { id: 'creator', label: 'المبدعون والمشاهير', icon: Sparkles },
-    { id: 'expert', label: 'مساعدة الخبراء المستعجلة', icon: Building }
+    { id: 'creator', label: 'مبدعون مباشر', icon: Sparkles },
+    { id: 'expert', label: 'خبراء الآن', icon: Building }
   ];
 
   const getSubsectionsList = () => {
@@ -640,11 +640,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] flex flex-col font-sans" dir="rtl">
+    <div className="min-h-screen soft-grid flex flex-col font-sans" dir="rtl">
       
       {/* GLOBAL HEADERS (Excluded in Calls & Landing layout for focus) */}
       {currentView !== 'call' && (
-        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100/80 shadow-xs transition-all">
+        <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/70 transition-all">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
             
             {/* Logo */}
@@ -656,11 +656,11 @@ export default function App() {
                 else setCurrentView('marketplace');
               }}
             >
-              <div className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white p-2.5 rounded-2xl shadow-indigo-100/85 shadow-md">
+              <div className="instant-gradient text-white p-2.5 rounded-2xl shadow-teal-100 shadow-md">
                 <PhoneCall className="w-4 h-4" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-l from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
-                كونكتو <span className="text-indigo-600 font-extrabold text-[10px] align-super">BENTO</span>
+                كونكتو <span className="text-teal-600 font-extrabold text-[10px] align-super">LIVE</span>
               </span>
             </div>
 
@@ -674,12 +674,12 @@ export default function App() {
                       onClick={() => { setCurrentView('admin'); loadAdminData(); }}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold leading-none flex items-center gap-1.5 border transition-all ${
                         currentView === 'admin' 
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                          ? 'bg-teal-50 border-teal-200 text-teal-700' 
                           : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
-                      لوحة المدير
+                      التحكم
                     </button>
                   )}
 
@@ -688,12 +688,12 @@ export default function App() {
                       onClick={() => setCurrentView('provider_dashboard')}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold leading-none flex items-center gap-1.5 border transition-all ${
                         currentView === 'provider_dashboard' 
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                          ? 'bg-teal-50 border-teal-200 text-teal-700' 
                           : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
                       <Activity className="w-3.5 h-3.5 animate-pulse" />
-                      مكتب الخبير
+                      أنا متاح
                     </button>
                   )}
 
@@ -701,24 +701,24 @@ export default function App() {
                     onClick={() => setCurrentView('marketplace')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold leading-none flex items-center gap-1.5 border transition-all ${
                       currentView === 'marketplace' 
-                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                        ? 'bg-teal-50 border-teal-200 text-teal-700' 
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <Search className="w-3.5 h-3.5" />
-                    السوق
+                    ابحث الآن
                   </button>
 
                   <button 
                     onClick={() => setCurrentView('settings')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold leading-none flex items-center gap-1.5 border transition-all ${
                       currentView === 'settings' 
-                        ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                        ? 'bg-teal-50 border-teal-200 text-teal-700' 
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <Settings className="w-3.5 h-3.5" />
-                    الإعدادات
+                    ملفي
                   </button>
 
                   {/* Profile capsule */}
@@ -750,9 +750,9 @@ export default function App() {
                   </button>
                   <button 
                     onClick={() => { setAuthMode('signup'); setCurrentView('auth'); }}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-indigo-100 cursor-pointer"
+                    className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm shadow-teal-100 cursor-pointer"
                   >
-                    إنشاء حساب كعميل
+                    ابدأ الآن
                   </button>
                 </div>
               )}
@@ -778,10 +778,10 @@ export default function App() {
 
             <div className="space-y-1">
               <span className="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                مكالمة هاتفية واردة
+                طلب مباشر الآن
               </span>
               <h3 className="font-extrabold text-xl text-slate-800 pt-2">{incomingCallRequest.clientName}</h3>
-              <p className="text-xs text-slate-400 font-medium">يرغب في استشارتك صوتياً الآن وبدء العداد السعري</p>
+              <p className="text-xs text-slate-400 font-medium">شخص يحتاجك الآن. اقبل المكالمة أو اعتذر بسرعة.</p>
             </div>
 
             <div className="flex items-center gap-3 pt-2">
@@ -791,7 +791,7 @@ export default function App() {
                 className="flex-1 py-3 bg-slate-100 hover:bg-rose-50 text-rose-600 hover:text-rose-700 text-xs font-bold rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-200"
               >
                 <PhoneOff className="w-4 h-4" />
-                رفض الاستشارة
+                اعتذار
               </button>
               <button 
                 id="accept-incoming-btn"
@@ -799,7 +799,7 @@ export default function App() {
                 className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-green-100"
               >
                 <Phone className="w-4 h-4" />
-                قبول وتوصيل
+                قبول الآن
               </button>
             </div>
           </div>
@@ -811,18 +811,18 @@ export default function App() {
 
         {/* 1. PUBLIC LANDING PAGE */}
         {currentView === 'landing' && (
-          <div className="flex-1 flex flex-col justify-center items-center px-4 py-8 max-w-6xl mx-auto space-y-12">
+          <div className="flex-1 flex flex-col justify-center items-center px-4 py-10 max-w-6xl mx-auto space-y-10">
             
             {/* Hero text */}
-            <div className="text-center space-y-4 max-w-2xl">
-              <span className="text-xs font-extrabold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 px-4 py-1.5 rounded-full inline-block">
-                مرحباً في ثورة الاتصال الصوتي المباشر 🚀
+            <div className="text-center space-y-5 max-w-3xl">
+              <span className="text-xs font-extrabold tracking-wide text-teal-700 bg-teal-50 border border-teal-100 px-4 py-2 rounded-full inline-flex items-center gap-2">
+                جاهز لما يحدث الآن
               </span>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-normal">
-                عندما تحتاج إلى أي خبير أو مشهور، <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">اتصل به فوراً!</span>
+              <h1 className="text-4xl md:text-6xl font-black text-slate-950 tracking-tight leading-tight">
+                افتح كونكتو، اختر شخصاً متاحاً، <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">وتكلم الآن.</span>
               </h1>
-              <p className="text-sm md:text-base text-slate-500 font-medium leading-relaxed">
-                لا حجز مواعيد بعد اليوم، لا جداول انتظار ولا معاملات معقدة. افتح التطبيق، تصفح المتاحين صوتياً الآن، واضغط اتصل ليجيبك بالدقيقة.
+              <p className="text-sm md:text-lg text-slate-600 font-semibold leading-relaxed">
+                لما تكون في موقف وتحتاج رأياً سريعاً، لا تبحث لساعات. محامي، دعم نفسي، صيدلي، خبير تقنية، فني سيارة، أو صانع محتوى تحبه، كلهم على بعد ضغطة.
               </p>
             </div>
 
@@ -830,41 +830,41 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl">
               
               {/* Lane 1: Celebrities */}
-              <div id="celebrity-lane-card" className="bento-card p-8 flex flex-col justify-between space-y-6 shadow-sm">
+              <div id="celebrity-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-amber-100 bg-white/95">
                 <div className="space-y-4 text-right">
-                  <div className="bg-amber-50 p-4 rounded-2xl text-amber-500 w-12 h-12 flex items-center justify-center">
+                  <div className="bg-amber-100 p-4 rounded-2xl text-amber-700 w-12 h-12 flex items-center justify-center">
                     <Sparkles className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">حارة المبدعين والمشاهير</h3>
+                  <h3 className="text-xl font-bold text-gray-900">مكالمات مع المبدعين</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    اتصل بمؤثريك المفضلين، نجوم الغناء، محللي الملاعب، نجوم الكوميديا والستريمرز. احظى باتصال ممتع بالدقيقة والتقط مكالمات خاصة بك.
+                    مكالمة قصيرة مع شخص تتابعه، سؤال سريع، تهنئة، نصيحة، أو لحظة خاصة بدون انتظار طويل.
                   </p>
                 </div>
                 <button 
                   onClick={() => navigateToSignup('client')}
-                  className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm shadow-amber-100 cursor-pointer"
+                  className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                 >
-                  تصفح المبدعين الآن
+                  شوف المتاحين
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
 
               {/* Lane 2: Legal / Expert help */}
-              <div id="expert-lane-card" className="bento-card p-8 flex flex-col justify-between space-y-6 shadow-sm">
+              <div id="expert-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-teal-100 bg-white/95">
                 <div className="space-y-4 text-right">
-                  <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 w-12 h-12 flex items-center justify-center">
+                  <div className="bg-teal-100 p-4 rounded-2xl text-teal-700 w-12 h-12 flex items-center justify-center">
                     <Shield className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">مساعدة الخبراء العاجلة</h3>
+                  <h3 className="text-xl font-bold text-gray-900">مساعدة لحظية من خبير</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    لست بحاجة للانتظار عند حدوث موقف جنائي، أو حادث، أو نوبة قلق، أو عطل بالسيارة. اتصل فوراً بالمحامي، المستشار، المبرمج، الصيدلي أو الفني لحل مشكلتك.
+                    شارع، سيارة، عقد، دواء، حساب مخترق، قلق مفاجئ. اختر القسم المناسب وتحدث مع شخص يفهم الموقف فوراً.
                   </p>
                 </div>
                 <button 
                   onClick={() => navigateToSignup('client')}
-                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm shadow-blue-100 cursor-pointer"
+                  className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm shadow-teal-100 cursor-pointer"
                 >
-                  احصل على استشارة فورية
+                  احتاج مساعدة الآن
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
@@ -872,18 +872,18 @@ export default function App() {
             </div>
 
             {/* Provider Application CTA Banner */}
-            <div id="provider-call-to-onboard" className="bg-gradient-to-tr from-slate-900 to-indigo-950 text-white rounded-3xl p-6 md:p-8 w-full max-w-4xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-md">
+            <div id="provider-call-to-onboard" className="instant-gradient text-white rounded-3xl p-6 md:p-8 w-full max-w-4xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-slate-200/60">
               <div className="text-right space-y-2">
-                <h3 className="text-lg md:text-xl font-extrabold">هل أنت خبير معتمد أو صانع محتوى مشهور؟</h3>
+                <h3 className="text-lg md:text-xl font-extrabold">هل تستطيع مساعدة الناس فوراً؟</h3>
                 <p className="text-xs text-indigo-200/90 font-medium">
-                  ابدأ بجني الأرباح بمجرد إتاحة حالتك إلى "متصل". حدد سعرك الخاص وباشر تلقي استشارات المرضى أو المتابعين.
+                  حدد سعرك، افتح حالتك، واستقبل مكالمات قصيرة من أشخاص يحتاجون خبرتك أو وقتك الآن.
                 </p>
               </div>
               <button 
                 onClick={() => navigateToSignup('provider')}
                 className="bg-white hover:bg-slate-50 text-slate-950 px-6 py-3 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer shrink-0"
               >
-                انضم كخبير / مزود خدمة
+                افتح حساب مزود
               </button>
             </div>
 
@@ -893,16 +893,16 @@ export default function App() {
         {/* 2. AUTHENTICATION PAGES (Login / Signup Choice) */}
         {currentView === 'auth' && (
           <div className="flex-1 flex items-center justify-center px-4 py-12">
-            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-md w-full space-y-6">
+            <div className="glass-panel p-6 md:p-8 rounded-3xl max-w-md w-full space-y-6">
               
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-extrabold text-slate-900">
-                  {authMode === 'login' ? 'مرحباً بعودتك في كونكتو' : 'إنشاء حساب جديد'}
+                  {authMode === 'login' ? 'جاهز نوصلك؟' : 'ابدأ خلال دقيقة'}
                 </h2>
                 <p className="text-xs text-slate-400 font-medium">
                   {authMode === 'login' 
-                    ? 'يرجى تسجيل الدخول لبدء استشارة الخبراء والمشاهير' 
-                    : 'سجل حسابك مجاناً وباشر استخدام منصة الاستشارات الفورية'}
+                    ? 'ادخل لحسابك وكمل من آخر نقطة.' 
+                    : 'اختر نوع حسابك وابدأ استخدام المكالمات الفورية.'}
                 </p>
               </div>
 
@@ -936,22 +936,22 @@ export default function App() {
                       onClick={() => setSignupRole('client')}
                       className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-all ${
                         signupRole === 'client' 
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                          ? 'bg-teal-50 border-teal-200 text-teal-700' 
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      عميل / مستشير
+                      أحتاج مساعدة
                     </button>
                     <button 
                       type="button"
                       onClick={() => setSignupRole('provider')}
                       className={`py-2 px-3 text-xs font-bold rounded-xl border text-center transition-all ${
                         signupRole === 'provider' 
-                          ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                          ? 'bg-teal-50 border-teal-200 text-teal-700' 
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      مزود خدمة / خبير
+                      أقدّم مكالمات
                     </button>
                   </div>
                 </div>
@@ -1021,9 +1021,9 @@ export default function App() {
                 <button 
                   type="submit"
                   disabled={authLoading}
-                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100 disabled:bg-slate-300 disabled:shadow-none cursor-pointer"
+                  className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-100 disabled:bg-slate-300 disabled:shadow-none cursor-pointer"
                 >
-                  {authLoading ? 'جاري التحقق...' : authMode === 'login' ? 'تأكيد تسجيل الدخول' : 'تفعيل رخصة الحساب'}
+                  {authLoading ? 'جاري التحقق...' : authMode === 'login' ? 'تأكيد تسجيل الدخول' : 'إنشاء الحساب'}
                 </button>
 
               </form>
@@ -1037,24 +1037,24 @@ export default function App() {
           <div className="flex-1 flex flex-col justify-center items-center p-6 text-center max-w-md mx-auto space-y-6">
             <div className="relative">
               <span className="absolute inset-0 rounded-full bg-indigo-100 animate-ping opacity-75" />
-              <div className="relative bg-indigo-50 p-6 rounded-full text-indigo-600">
+              <div className="relative bg-teal-50 p-6 rounded-full text-teal-600">
                 <Clock className="w-12 h-12" />
               </div>
             </div>
             
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-slate-800">حسابك قيد المراجعة والتحقق</h2>
+              <h2 className="text-2xl font-bold text-slate-800">نراجع حسابك الآن</h2>
               <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                أهلاً بك في كونكتو. لمطابقة تراخيض الخبراء وضمان تقديم استشارات قانونية وطبية ونفسية موثوقة من أصحاب المهن المعتمدين، تخضع طلبات التسجيل الجدد للمراجعة الإشرافية والتدقيق اليدوي من قبل موظفي الدعم الفني.
+                نراجع حسابات مزودي الخدمة قبل ظهورهم في البحث، حتى يعرف المستخدم أن الشخص الذي يتصل به حقيقي ومناسب للقسم.
               </p>
             </div>
 
             <div className="w-full bg-slate-100 rounded-2xl p-4 border border-slate-200 text-xs font-bold text-slate-600 space-y-1.5">
               <p className="animate-pulse flex items-center justify-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
-                جاري فحص حالة الموافقة الخاصة بك في الخلفية تلقائياً...
+                سنفتح لك استقبال المكالمات بمجرد الاعتماد...
               </p>
-              <p className="text-[10px] text-slate-400 font-medium">سنعيد توجيهك فوراً لمكتب الخبير بمجرد الاعتماد والترخيص.</p>
+              <p className="text-[10px] text-slate-400 font-medium">سنعيد توجيهك فوراً لأنا متاح بمجرد الاعتماد والترخيص.</p>
             </div>
 
             <button 
@@ -1071,13 +1071,13 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8 flex-1">
             
             {/* Title / Description */}
-            <div className="text-right space-y-1.5">
-              <h2 className="text-3xl font-extrabold text-slate-800 tracking-tight">سوق الاستشارات واللقاءات الفورية</h2>
-              <p className="text-xs text-slate-400 font-medium">تواصل فوري مع مئات الخبراء الموثقين وصانعي المحتوى بلحظتها.</p>
+            <div className="text-right space-y-2">
+              <h2 className="text-4xl font-black text-slate-950 tracking-tight">من تحتاج الآن؟</h2>
+              <p className="text-xs text-slate-400 font-medium">اختر القسم، شاهد المتاحين، وابدأ مكالمة قصيرة بدون موعد.</p>
             </div>
 
             {/* Custom Big Tabs (Creators vs Experts) */}
-            <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200">
+            <div className="grid grid-cols-2 gap-2 max-w-xl mx-auto bg-white/70 p-1.5 rounded-2xl border border-slate-200 shadow-sm">
               {marketplaceTabs.map(tab => {
                 const Icon = tab.icon;
                 const active = currentMarketplaceTab === tab.id;
@@ -1095,7 +1095,7 @@ export default function App() {
                         : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${active ? 'text-indigo-600' : ''}`} />
+                    <Icon className={`w-4 h-4 ${active ? 'text-teal-600' : ''}`} />
                     {tab.label}
                   </button>
                 );
@@ -1106,7 +1106,7 @@ export default function App() {
             {currentMarketplaceTab === 'expert' && <ExpertDisclaimer />}
 
             {/* Search, Filter box, category filters */}
-            <div className="bento-card p-6 shadow-sm space-y-6">
+            <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-6">
               
               {/* Row 1: Search & language */}
               <div className="flex flex-col md:flex-row items-stretch gap-4">
@@ -1134,7 +1134,7 @@ export default function App() {
                   <select
                     value={selectedLanguage}
                     onChange={e => setSelectedLanguage(e.target.value)}
-                    className="bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl text-xs font-bold focus:outline-none text-slate-700 min-w-32"
+                    className="bg-white border border-slate-200 py-3 px-4 rounded-xl text-xs font-bold focus:outline-none text-slate-700 min-w-32"
                   >
                     <option value="">جميع اللغات</option>
                     <option value="العربية">العربية</option>
@@ -1143,14 +1143,14 @@ export default function App() {
                   </select>
 
                   {/* Online Switcher */}
-                  <label className="flex items-center gap-2 bg-slate-50 border border-slate-200/90 px-4 py-3 rounded-xl cursor-not-allowed select-none cursor-pointer hover:bg-slate-100/50 transition-colors shrink-0">
+                  <label className="flex items-center gap-2 bg-white border border-slate-200/90 px-4 py-3 rounded-xl select-none cursor-pointer hover:bg-teal-50 transition-colors shrink-0">
                     <input 
                       type="checkbox"
                       checked={onlineOnly}
                       onChange={e => setOnlineOnly(e.target.checked)}
                       className="accent-blue-600 rounded-md w-4 h-4"
                     />
-                    <span className="text-xs font-bold text-slate-600">المتاحين صوتياً الآن فقط</span>
+                    <span className="text-xs font-bold text-slate-600">متاح الآن فقط</span>
                   </label>
 
                 </div>
@@ -1159,13 +1159,13 @@ export default function App() {
 
               {/* Dynamic Categories selection carousel */}
               <div className="space-y-2 text-right">
-                <label className="text-xs font-extrabold text-slate-500">التصنيفات الرئيسية</label>
+                <label className="text-xs font-extrabold text-slate-500">اختر المسار</label>
                 <div className="flex flex-wrap gap-2">
                   <button 
                     onClick={() => { setSelectedCategory(''); setSelectedSpecialty(''); }}
                     className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
                       selectedCategory === '' 
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-100' 
+                        ? 'bg-teal-600 border-teal-600 text-white shadow-sm shadow-teal-100' 
                         : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
                   >
@@ -1179,7 +1179,7 @@ export default function App() {
                         onClick={() => { setSelectedCategory(sec.slug); setSelectedSpecialty(''); }}
                         className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all ${
                           selectedCategory === sec.slug 
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-100' 
+                            ? 'bg-teal-600 border-teal-600 text-white shadow-sm shadow-teal-100' 
                             : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                       >
@@ -1193,17 +1193,17 @@ export default function App() {
               {/* Dynamic Specialty tags based on chosen Category */}
               {selectedCategory && getSubsectionsList().length > 0 && (
                 <div className="pt-2 border-t border-slate-100 space-y-1.5 text-right">
-                  <label className="text-xs font-bold text-blue-600">التخصصات الفرعية والدقيقة:</label>
+                  <label className="text-xs font-bold text-teal-600">خصص الطلب:</label>
                   <div className="flex flex-wrap gap-1.5">
                     <button 
                       onClick={() => setSelectedSpecialty('')}
                       className={`px-3 py-1 rounded-lg text-xs font-bold border transition-all ${
                         selectedSpecialty === '' 
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 font-extrabold' 
+                          ? 'bg-teal-50 border-teal-200 text-teal-700 font-extrabold' 
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      أبرز الخبراء
+                      الكل في هذا القسم
                     </button>
                     {getSubsectionsList().map(sub => (
                       <button 
@@ -1211,7 +1211,7 @@ export default function App() {
                         onClick={() => setSelectedSpecialty(sub.slug)}
                         className={`px-3 py-1 bg-white border rounded-lg text-xs font-semibold transition-all ${
                           selectedSpecialty === sub.slug 
-                            ? 'bg-blue-50 border-blue-200 text-blue-700 font-bold' 
+                            ? 'bg-teal-50 border-teal-200 text-teal-700 font-bold' 
                             : 'border-slate-200 text-slate-500 hover:bg-slate-50'
                         }`}
                       >
@@ -1228,7 +1228,7 @@ export default function App() {
             {loadingProviders ? (
               <div className="text-center py-20 space-y-3">
                 <span className="w-10 h-10 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin inline-block" />
-                <p className="text-xs font-bold text-slate-400">جاري تحميل قائمة مزودي الخدمات المتاحين...</p>
+                <p className="text-xs font-bold text-slate-400">نبحث عن المتاحين الآن...</p>
               </div>
             ) : providers.length === 0 ? (
               <div id="marketplace-empty-state" className="bento-card p-12 text-center space-y-4 max-w-md mx-auto shadow-inner">
@@ -1236,9 +1236,9 @@ export default function App() {
                   <Users className="w-7 h-7" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-bold text-lg text-slate-800">لا يوجد خبراء مطابقين لبحثك حالياً</h3>
+                  <h3 className="font-bold text-lg text-slate-800">لا أحد مطابق الآن</h3>
                   <p className="text-xs text-slate-400 font-medium leading-relaxed">
-                    لم نجد أي خبير أو مشهور مسجل ومتاح للاتصال تحت خيارات الفرز هذه. جرب تعديل مرشحات البحث ولغة التقديم.
+                    جرّب إزالة فلتر “متاح الآن”، أو اختر قسماً أوسع. السوق يتحرك حسب من فتح حالته.
                   </p>
                 </div>
                 <button 
@@ -1249,9 +1249,9 @@ export default function App() {
                     setOnlineOnly(false);
                     setSelectedLanguage('');
                   }}
-                  className="px-4 py-2 bg-blue-50 text-blue-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-blue-50 text-teal-600 text-xs font-bold rounded-xl hover:bg-blue-100 transition-colors cursor-pointer"
                 >
-                  إعادة تهيئة محركات الفرز
+                  امسح الفلاتر
                 </button>
               </div>
             ) : (
@@ -1280,7 +1280,7 @@ export default function App() {
               className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 text-xs font-bold border border-slate-200 rounded-xl flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
               <ArrowRight className="w-4 h-4" />
-              الرجوع للسوق
+              رجوع للبحث
             </button>
 
             {/* Main profile card */}
@@ -1319,20 +1319,20 @@ export default function App() {
                       onClick={() => handleBlockProvider(activeProfile.id)}
                       className="px-3 py-1.5 border border-rose-200 text-rose-600 hover:bg-rose-50 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
                     >
-                      حظر هذا الحساب
+                      حظر
                     </button>
                     <button 
                       onClick={() => setShowReportModal(true)}
                       className="px-3 py-1.5 border border-slate-200 text-slate-500 hover:bg-slate-50 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
                     >
-                      تقديم إبلاغ عن إساءة
+                      إبلاغ
                     </button>
                   </div>
                 </div>
 
                 {/* Main profile Bio description */}
                 <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                  {activeProfile.bio || 'لا توجد سيرة ذاتية مفصلة متوفرة حالياً لمقدم الخدمة.'}
+                  {activeProfile.bio || 'لم يضف هذا المزود نبذة بعد.'}
                 </p>
 
                 {/* Specialties list */}
@@ -1349,20 +1349,20 @@ export default function App() {
                 {/* Profile Stats blocks */}
                 <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 max-w-md">
                   <div className="bg-slate-50 p-3 rounded-2xl text-center">
-                    <p className="text-[10px] text-slate-400 font-bold">تقييم المشتركين</p>
+                    <p className="text-[10px] text-slate-400 font-bold">التقييم</p>
                     <div className="flex items-center justify-center gap-1 mt-1 text-slate-800">
                       <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
                       <span className="font-extrabold text-base">{activeProfile.avgRating}</span>
                     </div>
                   </div>
                   <div className="bg-slate-50 p-3 rounded-2xl text-center">
-                    <p className="text-[10px] text-slate-400 font-bold">المكافأة بالدقيقة</p>
+                    <p className="text-[10px] text-slate-400 font-bold">السعر</p>
                     <p className="font-extrabold text-base text-emerald-600 mt-1">
                       {activeProfile.settings?.pricePerMinute || 0} <span className="text-[10px] text-slate-500 font-medium">ريال</span>
                     </p>
                   </div>
                   <div className="bg-slate-50 p-3 rounded-2xl text-center">
-                    <p className="text-[10px] text-slate-400 font-bold">لغات التحدث</p>
+                    <p className="text-[10px] text-slate-400 font-bold">اللغة</p>
                     <p className="font-bold text-xs mt-1.5 text-slate-600">
                       {activeProfile.settings?.languages?.join(' / ') || 'العربية'}
                     </p>
@@ -1385,10 +1385,10 @@ export default function App() {
                   >
                     <Phone className="w-4 h-4" />
                     {activeProfile.settings?.availabilityStatus === 'online' 
-                      ? 'ابدأ اتصال صوتي فوري الآن' 
+                      ? 'اتصل الآن' 
                       : activeProfile.settings?.availabilityStatus === 'busy' 
-                      ? 'مزود الخدمة مشغول، اتصل على أي حال'
-                      : 'غير متوفر للاتصالات الهاتفية حالياً'}
+                      ? 'مشغول حالياً'
+                      : 'غير متاح الآن'}
                   </button>
                 </div>
 
@@ -1401,11 +1401,11 @@ export default function App() {
 
             {/* Reviews Section List */}
             <div className="space-y-4">
-              <h3 className="font-extrabold text-lg text-slate-800">أحدث آراء وتقييمات العملاء ({activeProfileReviews.length})</h3>
+              <h3 className="font-extrabold text-lg text-slate-800">آخر التجارب ({activeProfileReviews.length})</h3>
               
               {activeProfileReviews.length === 0 ? (
                 <div className="bg-white rounded-3xl border border-slate-100 p-8 text-center text-slate-400 font-medium text-xs">
-                  لا توجد أي تقييمات صوتية سابقة لهذا المزود حتى الآن.
+                  لا توجد تقييمات بعد. كن أول من يترك تجربة.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -1447,16 +1447,16 @@ export default function App() {
               <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-white p-6 rounded-3xl max-w-md w-full space-y-4 border border-slate-100 shadow-xl">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-base text-slate-800">إبلاغ سريع عن الحساب</h3>
+                    <h3 className="font-extrabold text-base text-slate-800">إبلاغ عن مشكلة</h3>
                     <button onClick={() => setShowReportModal(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5 cursor-pointer" /></button>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs text-slate-500 font-bold">سبب الإبلاغ بالتفصيل</label>
+                    <label className="text-xs text-slate-500 font-bold">ما المشكلة؟</label>
                     <textarea 
                       value={reportReason}
                       onChange={e => setReportReason(e.target.value)}
                       rows={4}
-                      placeholder="يرجى كتابة سبب الإبلاغ، هل هناك تعدي ديني، أخلاقي، طبي غير مرخص أو فني مضلل..."
+                      placeholder="اكتب ما حدث باختصار. سنراجعه من لوحة الإدارة."
                       className="w-full text-xs font-medium p-3 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white focus:ring-1 focus:ring-rose-500 focus:border-rose-500 resize-none"
                     />
                   </div>
@@ -1465,13 +1465,13 @@ export default function App() {
                       onClick={() => setShowReportModal(false)}
                       className="flex-1 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer"
                     >
-                      إلغاء الأمر
+                      إلغاء
                     </button>
                     <button 
                       onClick={handleReportProvider}
                       className="flex-1 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-all shadow-sm cursor-pointer shadow-rose-100"
                     >
-                      إرسال البلاغ فوراً
+                      إرسال البلاغ
                     </button>
                   </div>
                 </div>
@@ -1500,13 +1500,13 @@ export default function App() {
                     <h2 className="text-xl font-extrabold">{currentUser.fullName}</h2>
                     {currentUser.verified && <CheckCircle2 className="w-4 h-4 text-blue-400 fill-blue-500/10" />}
                   </div>
-                  <p className="text-xs text-slate-300 font-medium">مرحباً بك في مكتبك كخبير معتمد على منصة كونكتو.</p>
+                  <p className="text-xs text-slate-300 font-medium">افتح حالتك عندما تكون جاهزاً لاستقبال مكالمات مباشرة.</p>
                 </div>
               </div>
 
               {/* Status Switcher right side */}
               <div className="bg-slate-800 p-2.5 rounded-2xl border border-slate-700 text-right space-y-1.5 w-full md:w-auto min-w-56">
-                <p className="text-[10px] font-extrabold text-slate-300">حالتك للاتصال الهاتفي الصوتي:</p>
+                <p className="text-[10px] font-extrabold text-slate-300">استقبال المكالمات:</p>
                 <div className="grid grid-cols-3 gap-1.5">
                   <button 
                     onClick={() => handleProviderToggleStatus('online')}
@@ -1536,7 +1536,7 @@ export default function App() {
                         : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                     }`}
                   >
-                    مغلق
+                    غير متاح
                   </button>
                 </div>
               </div>
@@ -1548,7 +1548,7 @@ export default function App() {
               <div id="availability-warning" className="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 flex items-center gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
                 <p className="text-xs font-bold">
-                  أنت مسجل كـ "مغلق" حالياً. لن تظهر في نتائج تصفح العملاء، ولن تتلقى أي رنين للمكالمات الواردة. يرجى تفعيل الحالة إلى "متصل" لاستقبال الاستشارات الطارئة.
+                  أنت مسجل كـ "غير متاح" حالياً. لن تظهر في نتائج تصفح العملاء، ولن تتلقى أي رنين للمكالمات الواردة. يرجى تفعيل الحالة إلى "متصل" لاستقبال الاستشارات الطارئة.
                 </p>
               </div>
             )}
@@ -1557,24 +1557,24 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               
               <div className="bg-white border border-slate-100 p-5 rounded-3xl shadow-xs space-y-2">
-                <p className="text-xs font-bold text-slate-400">سعر الاستشارة الصوتي</p>
-                <p className="text-2xl font-extrabold text-indigo-600">
+                <p className="text-xs font-bold text-slate-400">سعرك الحالي</p>
+                <p className="text-2xl font-extrabold text-teal-600">
                   {settingsPrice} <span className="text-xs font-bold text-slate-400">ريال/دقيقة</span>
                 </p>
               </div>
 
               <div className="bg-white border border-slate-100 p-5 rounded-3xl shadow-xs space-y-2">
-                <p className="text-xs font-bold text-slate-400">التصنيف والاعتماد</p>
+                <p className="text-xs font-bold text-slate-400">مسارك</p>
                 <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-slate-600 inline-block">
                   {settingsProviderType === 'creator' ? 'مبدع / صانع محتوى' : 'خبير معتمد'}
                 </span>
               </div>
 
               <div className="bg-white border border-slate-100 p-5 rounded-3xl shadow-xs space-y-2">
-                <p className="text-xs font-bold text-slate-400">تراخيص التوثيق</p>
+                <p className="text-xs font-bold text-slate-400">التوثيق</p>
                 <span className={`text-xs font-bold px-3 py-1 rounded-full border inline-block ${
                   currentUser.verified 
-                    ? 'bg-blue-50 border-blue-200 text-blue-600' 
+                    ? 'bg-blue-50 border-blue-200 text-teal-600' 
                     : 'bg-amber-50 border-amber-200 text-amber-600'
                 }`}>
                   {currentUser.verified ? 'مكتمل وموثق رسمي' : 'قيد التدقيق والطلب'}
@@ -1582,7 +1582,7 @@ export default function App() {
               </div>
 
               <div className="bg-white border border-slate-100 p-5 rounded-3xl shadow-xs space-y-2">
-                <p className="text-xs font-bold text-slate-400">لغات الاستشارة</p>
+                <p className="text-xs font-bold text-slate-400">لغاتك</p>
                 <p className="text-[11px] font-bold text-slate-600">{settingsLanguages.join('، ')}</p>
               </div>
 
@@ -1594,14 +1594,14 @@ export default function App() {
               {/* Box 1: Verified Document form */}
               {!currentUser.verified && (
                 <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm space-y-4">
-                  <h3 className="font-extrabold text-base text-slate-800">إرسال وثائق التوثيق وإثبات الترخيص (للحصول على الشارة الزرقاء)</h3>
+                  <h3 className="font-extrabold text-base text-slate-800">وثّق خبرتك</h3>
                   <p className="text-xs text-slate-400 leading-relaxed font-semibold">
-                    المكتب الاستشاري للمنصة يتطلب وجود شهادات أكاديمية، أو رخص تشغيل معتمدة (مثل رخص الهيئة السعودية للتخصصات الطبية، رخصة المحاماة من وزارة العدل، إلخ) لتوثيق وتفعيل حسابك.
+                    للقانون والطب والصحة النفسية، نحتاج رخصة أو إثبات مهني قبل منح شارة التوثيق.
                   </p>
 
                   <form onSubmit={handleVerifyRequest} className="space-y-4 pt-2">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-600">المجال الدقيق للاعتماد (Profession)</label>
+                      <label className="text-xs font-bold text-slate-600">مجالك المهني</label>
                       <input 
                         type="text"
                         required
@@ -1613,7 +1613,7 @@ export default function App() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-600">منطقة الاختصاص أو جهة الاعتماد (Jurisdiction)</label>
+                      <label className="text-xs font-bold text-slate-600">جهة الاعتماد</label>
                       <input 
                         type="text"
                         required
@@ -1625,7 +1625,7 @@ export default function App() {
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-600">رقم ترخيص مزاولة المهنة (License Number)</label>
+                      <label className="text-xs font-bold text-slate-600">رقم الترخيص</label>
                       <input 
                         type="text"
                         required
@@ -1637,16 +1637,16 @@ export default function App() {
                     </div>
 
                     {verificationSavedMsg && (
-                      <div className="p-3 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold rounded-xl">
+                      <div className="p-3 bg-teal-50 border border-indigo-100 text-teal-700 text-xs font-bold rounded-xl">
                         {verificationSavedMsg}
                       </div>
                     )}
 
                     <button 
                       type="submit"
-                      className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+                      className="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
                     >
-                      إرسال معلومات الترخيص للمراجعة
+                      إرسال للمراجعة
                     </button>
                   </form>
                 </div>
@@ -1654,7 +1654,7 @@ export default function App() {
 
               {/* Box 2: Recent Reviews */}
               <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm space-y-4">
-                <h3 className="font-extrabold text-base text-slate-800">أحدث مراجعات وتقييمات عملائك</h3>
+                <h3 className="font-extrabold text-base text-slate-800">آخر ما قاله العملاء</h3>
                 
                 <div className="space-y-3 max-h-[340px] overflow-y-auto">
                   {/* Pull dynamically or write simple mockup reviews */}
@@ -1685,7 +1685,7 @@ export default function App() {
               
               {/* Call indicator visual bubble */}
               <div className="relative">
-                <span className={`absolute inset-0 rounded-full bg-indigo-500/10 animate-ping duration-1000 ${
+                <span className={`absolute inset-0 rounded-full bg-teal-500/10 animate-ping duration-1000 ${
                   activeCall.status === 'ringing' ? 'inline-block' : 'hidden'
                 }`} />
                 <img 
@@ -1704,7 +1704,7 @@ export default function App() {
                     activeCall.status === 'ringing' ? 'bg-amber-400 animate-pulse' : 'bg-green-500'
                   }`} />
                   <span className="text-xs font-bold tracking-widest uppercase text-slate-400">
-                    {activeCall.status === 'ringing' ? 'جاري الرنين والاتصال...' : 'مكالمة نشطة الآن'}
+                    {activeCall.status === 'ringing' ? 'يرن الآن...' : 'أنتما متصلان'}
                   </span>
                 </div>
               </div>
@@ -1723,9 +1723,9 @@ export default function App() {
                     {formatTimer(callTimer)}
                   </p>
                 ) : (
-                  <p className="text-slate-400 text-xs font-medium animate-pulse">يرجى الانتظار لحين قبول مزود الخدمة للمكالمة...</p>
+                  <p className="text-slate-400 text-xs font-medium animate-pulse">ننتظر قبوله للمكالمة...</p>
                 )}
-                <p className="text-[10px] text-slate-500 font-bold">بمعدل احتساب بالدقيقة عبر المحفظة</p>
+                <p className="text-[10px] text-slate-500 font-bold">يحسب الوقت بعد قبول المكالمة</p>
               </div>
 
               {/* Functional Keypads Mute / Hang Up */}
@@ -1769,32 +1769,32 @@ export default function App() {
         {/* 8. CALL SUMMARY & EVALUATION REPORT CARD */}
         {currentView === 'call_summary' && summaryCall && (
           <div className="flex-1 flex justify-center items-center px-4 py-12">
-            <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-xl max-w-md w-full space-y-6 text-center">
+            <div className="glass-panel p-6 md:p-8 rounded-3xl max-w-md w-full space-y-6 text-center">
               
               <div className="bg-green-50 p-4 rounded-full w-14 h-14 flex items-center justify-center text-green-500 mx-auto border border-green-100">
                 <Check className="w-7 h-7" />
               </div>
 
               <div className="space-y-1">
-                <h2 className="text-2xl font-extrabold text-slate-800">اكتملت المكالمة بنجاح</h2>
-                <p className="text-xs text-slate-400 font-medium">شكراً لاستخدامك منصة كونكتو للاستشارت الموثوقة</p>
+                <h2 className="text-2xl font-extrabold text-slate-800">انتهت المكالمة</h2>
+                <p className="text-xs text-slate-400 font-medium">قيّم التجربة وساعد غيرك يختار بسرعة.</p>
               </div>
 
               {/* Call receipt cards */}
               <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 text-right space-y-3 font-semibold">
                 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-medium">اسم مقدم الخدمة:</span>
+                  <span className="text-slate-400 font-medium">المزود:</span>
                   <span className="text-slate-800 font-bold">{summaryCall.providerName}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-medium">مدة المكالمة الفعلية:</span>
+                  <span className="text-slate-400 font-medium">المدة:</span>
                   <span className="text-slate-800 font-mono font-bold leading-none">{formatTimer(summaryCall.durationSeconds || 0)}</span>
                 </div>
 
                 <div className="flex justify-between items-center text-xs border-t border-slate-200/85 pt-2">
-                  <span className="text-slate-400 font-medium">التكلفة الإجمالية للحساب:</span>
+                  <span className="text-slate-400 font-medium">التكلفة التقريبية:</span>
                   <span className="text-emerald-600 font-extrabold tracking-tight">
                     {Math.round(((summaryCall.durationSeconds || 0) / 60) * 10) / 10 || 1} ريال تقريباً
                   </span>
@@ -1802,12 +1802,8 @@ export default function App() {
 
               </div>
 
-              {/* TODO comments boundary */}
               <div className="text-[10px] text-slate-400 text-center font-bold px-4 leading-relaxed">
-                * ملاحظة: يتم سحب التكلفة تلقائياً من محفظتك الموصولة.
-                <span className="block text-indigo-500 bg-indigo-50 py-1.5 px-3 rounded-lg mt-2 border border-indigo-100">
-                  TODO: تمكين رخص الدفع التجاري عبر خطوط Stripe / Tap / HyperPay لاحقاً.
-                </span>
+                * سيظهر الإيصال النهائي بعد تفعيل الدفع الإلكتروني وربط المحفظة.
               </div>
 
               {/* Review Prompt strictly for Clients */}
@@ -1815,7 +1811,7 @@ export default function App() {
                 <form onSubmit={handleSubmitReview} className="space-y-4 pt-2 border-t border-slate-100 text-right">
                   
                   <div className="space-y-1.5">
-                    <label className="text-xs font-extrabold text-slate-600">كيف تقيم جودة الاستشارة وفائدة المكالمة؟</label>
+                    <label className="text-xs font-extrabold text-slate-600">كيف كانت المكالمة؟</label>
                     <div className="flex items-center justify-center gap-2 py-1">
                       {[1,2,3,4,5].map(val => (
                         <button
@@ -1831,12 +1827,12 @@ export default function App() {
                   </div>
 
                   <div className="space-y-1 text-right">
-                    <label className="text-xs font-bold text-slate-600">كتابة مراجعة مكتوبة قصيرة (اختياري)</label>
+                    <label className="text-xs font-bold text-slate-600">تعليق قصير اختياري</label>
                     <textarea 
                       value={reviewComment}
                       onChange={e => setReviewComment(e.target.value)}
                       rows={3}
-                      placeholder="اكتب آرائك ومقترحاتك حول هذا الخبير، لمساعدة المستشارين الآخرين في السوق..."
+                      placeholder="اكتب آرائك ومقترحاتك حول هذا الخبير، لمساعدة المستشارين الآخرين في ابحث الآن..."
                       className="w-full text-xs font-medium p-3 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:bg-white resize-none"
                     />
                   </div>
@@ -1844,9 +1840,9 @@ export default function App() {
                   <button 
                     type="submit"
                     disabled={submittingReview}
-                    className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100 disabled:bg-slate-300"
+                    className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-100 disabled:bg-slate-300"
                   >
-                    {submittingReview ? 'جاري إرسال المراجعة...' : 'حفظ التقييم والعودة للسوق'}
+                    {submittingReview ? 'جاري إرسال المراجعة...' : 'إرسال والعودة'}
                   </button>
 
                 </form>
@@ -1856,9 +1852,9 @@ export default function App() {
                     setSummaryCall(null);
                     setCurrentView('provider_dashboard');
                   }}
-                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100"
+                  className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-100"
                 >
-                  العودة لمكتب الخبير
+                  العودة لأنا متاح
                 </button>
               )}
 
@@ -1872,8 +1868,8 @@ export default function App() {
             <div className="bg-white rounded-3xl border border-slate-100 shadow-md p-6 md:p-8 space-y-6">
               
               <div className="text-right space-y-1 border-b border-slate-100 pb-4">
-                <h2 className="text-2xl font-extrabold text-slate-800">إعدادات ملف التعريف الشخصي</h2>
-                <p className="text-xs text-slate-400 font-medium">التحكم في بيانات العرض العام وسعر تقديم استشاراتك ومواقع الرنين.</p>
+                <h2 className="text-2xl font-extrabold text-slate-800">ملفك العام</h2>
+                <p className="text-xs text-slate-400 font-medium">هذه المعلومات تظهر للناس قبل أن يتصلوا بك.</p>
               </div>
 
               <form onSubmit={handleSaveSettings} className="space-y-6">
@@ -1881,7 +1877,7 @@ export default function App() {
                 {/* Section A: Core profile details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-600">الاسم المعروض بالكامل</label>
+                    <label className="text-xs font-bold text-slate-600">الاسم الظاهر</label>
                     <input 
                       type="text" 
                       value={settingsFullName}
@@ -1891,7 +1887,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-600 font-mono">رابط الصورة الشخصية (Avatar URL)</label>
+                    <label className="text-xs font-bold text-slate-600 font-mono">رابط الصورة</label>
                     <input 
                       type="text" 
                       value={settingsAvatar}
@@ -1902,7 +1898,7 @@ export default function App() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">النبذة التعريفية القصير العامة (Bio)</label>
+                  <label className="text-xs font-bold text-slate-600">نبذة قصيرة</label>
                   <textarea 
                     value={settingsBio}
                     onChange={e => setSettingsBio(e.target.value)}
@@ -1914,24 +1910,24 @@ export default function App() {
                 {/* Section B: Provider Specific configurations */}
                 {currentUser.role === 'provider' && (
                   <div className="space-y-6 border-t border-slate-100 pt-6">
-                    <h3 className="font-extrabold text-slate-800 text-sm">إعدادات توجيه تقديم الخدمة</h3>
+                    <h3 className="font-extrabold text-slate-800 text-sm">كيف تريد أن تظهر؟</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">نوع الخدمة الكلي ومجالك</label>
+                        <label className="text-xs font-bold text-slate-600">نوع الحساب</label>
                         <select
                           value={settingsProviderType}
                           onChange={e => setSettingsProviderType(e.target.value as 'creator' | 'expert')}
                           className="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-lg"
                         >
-                          <option value="creator">المبدعون والمشاهير (موسيقى، رياضة، يوتيوب)</option>
+                          <option value="creator">مبدعون مباشر (موسيقى، رياضة، يوتيوب)</option>
                           <option value="expert">خبير استشاري (قانون، طب، تقنية، أعمال، ميكانيكا)</option>
                         </select>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">سعر الاستشارة الصوتي بالدقيقة</label>
+                        <label className="text-xs font-bold text-slate-600">سعرك الحالي بالدقيقة</label>
                         <input 
                           type="number" 
                           value={settingsPrice}
@@ -1947,13 +1943,13 @@ export default function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">التصنيف الرئيسي المعروض في الفلترة</label>
+                        <label className="text-xs font-bold text-slate-600">القسم الرئيسي</label>
                         <select
                           value={settingsCategory}
                           onChange={e => setSettingsCategory(e.target.value)}
                           className="w-full text-xs font-bold p-2.5 bg-slate-50 border border-slate-200 rounded-lg"
                         >
-                          <option value="creators-celebrities">المبدعون والمشاهير</option>
+                          <option value="creators-celebrities">مبدعون مباشر</option>
                           <option value="legal">القانون والشرائع</option>
                           <option value="emotional-support">الدعم النفسي والاجتماعي</option>
                           <option value="medical-guidance">الإرشاد الصيدلاني والطبي</option>
@@ -1965,7 +1961,7 @@ export default function App() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-600">لغات الاستشارة المتاحة لك</label>
+                        <label className="text-xs font-bold text-slate-600">لغاتك المتاحة لك</label>
                         <div className="flex gap-2">
                           {['العربية', 'الإنجليزية', 'الفرنسية'].map(lang => {
                             const isSelected = settingsLanguages.includes(lang);
@@ -1979,7 +1975,7 @@ export default function App() {
                                 }}
                                 className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
                                   isSelected 
-                                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                                    ? 'bg-teal-50 border-teal-200 text-teal-700' 
                                     : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                                 }`}
                               >
@@ -1994,7 +1990,7 @@ export default function App() {
 
                     {/* Specialty Checklist */}
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-600">التخصصات الفرعية الدقيقة المتاحة في التصنيف المختار (حدد للتفعيل)</label>
+                      <label className="text-xs font-bold text-slate-600">اختر ما تستطيع مساعدتهم فيه</label>
                       <div className="flex flex-wrap gap-2">
                         {/* Dynamically list matching subsections from our constant file */}
                         {MARKETPLACE_SECTIONS_DATA.find(s => s.slug === settingsCategory)?.subsections?.map(sub => {
@@ -2006,7 +2002,7 @@ export default function App() {
                               onClick={() => toggleSpecialty(sub.slug)}
                               className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
                                 active 
-                                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700' 
+                                  ? 'bg-teal-50 border-teal-200 text-teal-700' 
                                   : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 font-medium'
                               }`}
                             >
@@ -2029,9 +2025,9 @@ export default function App() {
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
                   <button 
                     type="submit"
-                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm"
+                    className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm"
                   >
-                    حفظ كافة التغييرات والملف لكونكتو
+                    حفظ التغييرات
                   </button>
                 </div>
 
@@ -2047,14 +2043,14 @@ export default function App() {
             
             <div className="text-right space-y-1 flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 tracking-tight">مكتب مراقبة وإدارة نظام كونكتو</h2>
-                <p className="text-xs text-slate-400 font-medium">مستشاري الاعتماد الوطني، حظر البلاغات وتوثيق رخص المهنة والتحقق من التراخيص.</p>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">لوحة تحكم كونكتو</h2>
+                <p className="text-xs text-slate-400 font-medium">مراجعة الحسابات، التوثيق، البلاغات، ومؤشرات التشغيل.</p>
               </div>
               <button 
                 onClick={loadAdminData}
-                className="px-3 py-1.5 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl hover:bg-indigo-100 transition-colors cursor-pointer"
+                className="px-3 py-1.5 bg-teal-50 text-teal-700 text-xs font-bold rounded-xl hover:bg-indigo-100 transition-colors cursor-pointer"
               >
-                تحديث البيانات الفوري
+                تحديث
               </button>
             </div>
 
@@ -2063,7 +2059,7 @@ export default function App() {
               <button 
                 onClick={() => setAdminActiveTab('approvals')}
                 className={`py-2 px-4 text-xs font-bold border-b-2 transition-all ${
-                  adminActiveTab === 'approvals' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                  adminActiveTab === 'approvals' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
                 طلبات العضوية للخبراء ({adminUsers.filter(u => !u.approved).length})
@@ -2071,7 +2067,7 @@ export default function App() {
               <button 
                 onClick={() => setAdminActiveTab('verifications')}
                 className={`py-2 px-4 text-xs font-bold border-b-2 transition-all ${
-                  adminActiveTab === 'verifications' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                  adminActiveTab === 'verifications' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
                 رخص التوثيق المهني ({adminVerifications.filter(v => v.status === 'pending').length})
@@ -2079,7 +2075,7 @@ export default function App() {
               <button 
                 onClick={() => setAdminActiveTab('reports')}
                 className={`py-2 px-4 text-xs font-bold border-b-2 transition-all ${
-                  adminActiveTab === 'reports' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                  adminActiveTab === 'reports' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
                 البلاغات المرفوعة ({adminReports.length})
@@ -2087,10 +2083,10 @@ export default function App() {
               <button 
                 onClick={() => setAdminActiveTab('analytics')}
                 className={`py-2 px-4 text-xs font-bold border-b-2 transition-all ${
-                  adminActiveTab === 'analytics' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                  adminActiveTab === 'analytics' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                ملخص الإحصائيات وبورتو التحليلات
+                الإحصائيات
               </button>
             </div>
 
@@ -2334,7 +2330,7 @@ export default function App() {
 
                         <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 space-y-1">
                           <p className="text-[10px] font-bold text-slate-400">تسجيلات اليوم الجديدة</p>
-                          <p className="text-3xl font-black text-indigo-600">{adminAnalytics.newUsersToday}</p>
+                          <p className="text-3xl font-black text-teal-600">{adminAnalytics.newUsersToday}</p>
                         </div>
 
                       </div>
@@ -2353,7 +2349,7 @@ export default function App() {
 
                         <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 space-y-1">
                           <p className="text-[10px] font-bold text-slate-400">معدل الاستهلاك اليوم</p>
-                          <p className="text-3xl font-black text-indigo-600">{adminAnalytics.callsToday}</p>
+                          <p className="text-3xl font-black text-teal-600">{adminAnalytics.callsToday}</p>
                         </div>
 
                         <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 space-y-1">
@@ -2379,8 +2375,8 @@ export default function App() {
       {/* FOOTER */}
       {currentView !== 'call' && (
         <footer className="bg-white border-t border-slate-100 py-8 text-center text-xs font-semibold text-slate-400/90 max-w-7xl mx-auto w-full px-4 mt-12">
-          <p>© {new Date().getFullYear()} كونكتو (Connectoo). جميع الحقوق محفوظة لوزارة الاتصالات وحماية المشتركين والاعتماد المهني.</p>
-          <p className="text-[10px] text-slate-300 font-bold mt-1">تطوير مخصص لدعم المكالمات عبر قنوات الـ Agora RTC الفورية المشفرة بالكامل.</p>
+          <p>© {new Date().getFullYear()} كونكتو. مكالمات مباشرة عندما تحتاج شخصاً الآن.</p>
+          <p className="text-[10px] text-slate-300 font-bold mt-1">نسخة قيد التجهيز للإطلاق، مدعومة بقاعدة Supabase ومكالمات Agora.</p>
         </footer>
       )}
 
