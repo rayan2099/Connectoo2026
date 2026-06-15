@@ -864,7 +864,7 @@ export default function App() {
                   onClick={() => navigateToSignup('client')}
                   className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm shadow-teal-100 cursor-pointer"
                 >
-                  احتاج مساعدة الآن
+                  أحتاج خبيراً الآن
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
@@ -874,16 +874,16 @@ export default function App() {
             {/* Provider Application CTA Banner */}
             <div id="provider-call-to-onboard" className="instant-gradient text-white rounded-3xl p-6 md:p-8 w-full max-w-4xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-slate-200/60">
               <div className="text-right space-y-2">
-                <h3 className="text-lg md:text-xl font-extrabold">هل تستطيع مساعدة الناس فوراً؟</h3>
+                <h3 className="text-lg md:text-xl font-extrabold">هل لديك جمهور أو خبرة يمكن الاتصال بها؟</h3>
                 <p className="text-xs text-indigo-200/90 font-medium">
-                  حدد سعرك، افتح حالتك، واستقبل مكالمات قصيرة من أشخاص يحتاجون خبرتك أو وقتك الآن.
+                  سواء كنت مؤثراً، فناناً، مستشاراً، أو خبيراً عملياً: حدد سعرك وافتح حالتك ليستطيع الناس الاتصال بك فوراً.
                 </p>
               </div>
               <button 
                 onClick={() => navigateToSignup('provider')}
                 className="bg-white hover:bg-slate-50 text-slate-950 px-6 py-3 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer shrink-0"
               >
-                افتح حساب مزود
+                استقبل مكالمات مدفوعة
               </button>
             </div>
 
@@ -902,7 +902,7 @@ export default function App() {
                 <p className="text-xs text-slate-400 font-medium">
                   {authMode === 'login' 
                     ? 'ادخل لحسابك وكمل من آخر نقطة.' 
-                    : 'اختر نوع حسابك وابدأ استخدام المكالمات الفورية.'}
+                    : 'اختر هل تريد الاتصال بالآخرين، أم استقبال مكالمات من جمهورك أو عملائك.'}
                 </p>
               </div>
 
@@ -929,7 +929,7 @@ export default function App() {
               {/* Role Selection toggles only for new signup */}
               {authMode === 'signup' && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-extrabold text-slate-500">نوع الحساب</label>
+                  <label className="text-xs font-extrabold text-slate-500">كيف ستستخدم كونكتو؟</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button 
                       type="button"
@@ -940,7 +940,7 @@ export default function App() {
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      أحتاج مساعدة
+                      أريد الاتصال
                     </button>
                     <button 
                       type="button"
@@ -951,7 +951,7 @@ export default function App() {
                           : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                       }`}
                     >
-                      أقدّم مكالمات
+                      أستقبل مكالمات
                     </button>
                   </div>
                 </div>
@@ -1915,7 +1915,7 @@ export default function App() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-slate-600">نوع الحساب</label>
+                        <label className="text-xs font-bold text-slate-600">نوع الظهور</label>
                         <select
                           value={settingsProviderType}
                           onChange={e => setSettingsProviderType(e.target.value as 'creator' | 'expert')}
