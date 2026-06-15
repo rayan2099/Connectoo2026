@@ -30,6 +30,8 @@ export default function App() {
   const [signupRolePreset, setSignupRolePreset] = useState(false);
   const [showProviderSignupOptions, setShowProviderSignupOptions] = useState(false);
   const [landingPreviewFilter, setLandingPreviewFilter] = useState('all');
+  const [selectedLandingPreviewCard, setSelectedLandingPreviewCard] = useState<any | null>(null);
+  const [showPreviewSigninPrompt, setShowPreviewSigninPrompt] = useState(false);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
@@ -867,6 +869,24 @@ export default function App() {
     ? landingPreviewCards
     : landingPreviewCards.filter(card => card.group === landingPreviewFilter);
 
+  const handleLandingPreviewCall = () => {
+    if (!currentUser) {
+      setShowPreviewSigninPrompt(true);
+      return;
+    }
+
+    if (selectedLandingPreviewCard) {
+      setSearchQuery(selectedLandingPreviewCard.name);
+      setNeedPrompt(selectedLandingPreviewCard.reason);
+      setSelectedCategory('');
+      setSelectedSpecialty('');
+    }
+
+    setSelectedLandingPreviewCard(null);
+    setShowPreviewSigninPrompt(false);
+    setCurrentView('marketplace');
+  };
+
   const getSubsectionsList = () => {
     const selectedSection = sections.find(s => s.slug === selectedCategory);
     return selectedSection?.subsections || [];
@@ -1039,6 +1059,116 @@ export default function App() {
         </div>
       )}
 
+      {selectedLandingPreviewCard && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4" dir="rtl">
+          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-100 overflow-hidden">
+            <div className="p-5 md:p-6 space-y-5 text-right">
+              <div className="flex items-start justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedLandingPreviewCard(null);
+                    setShowPreviewSigninPrompt(false);
+                  }}
+                  className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 transition-all"
+                  title="إغلاق"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <div className="text-right space-y-1">
+                    <span className="inline-flex text-[10px] font-black px-2.5 py-1 rounded-full bg-teal-50 text-teal-700">
+                      {selectedLandingPreviewCard.type}
+                    </span>
+                    <h3 className="text-2xl font-black text-slate-950">{selectedLandingPreviewCard.name}</h3>
+                    <p className="text-[11px] text-slate-400 font-mono" dir="ltr">@{selectedLandingPreviewCard.handle}</p>
+                  </div>
+                  <div className="relative shrink-0">
+                    <img
+                      src={selectedLandingPreviewCard.image}
+                      alt={selectedLandingPreviewCard.name}
+                      referrerPolicy="no-referrer"
+                      className="w-20 h-20 rounded-3xl object-cover border border-slate-200 bg-slate-50"
+                    />
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full border-2 border-white bg-emerald-500" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="bg-slate-50 rounded-2xl p-3 text-center">
+                  <p className="text-[10px] text-slate-400 font-bold">التقييم</p>
+                  <p className="text-sm font-black text-slate-900 inline-flex items-center justify-center gap-1">
+                    {selectedLandingPreviewCard.rating}
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  </p>
+                </div>
+                <div className="bg-slate-50 rounded-2xl p-3 text-center">
+                  <p className="text-[10px] text-slate-400 font-bold">المكالمات</p>
+                  <p className="text-sm font-black text-slate-900">{selectedLandingPreviewCard.calls}</p>
+                </div>
+                <div className="bg-slate-50 rounded-2xl p-3 text-center">
+                  <p className="text-[10px] text-slate-400 font-bold">السعر</p>
+                  <p className="text-sm font-black text-slate-900">{selectedLandingPreviewCard.price} ر.س/د</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-black text-slate-900">متى يكون مناسباً؟</h4>
+                <p className="text-sm text-slate-600 font-semibold leading-relaxed bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                  {selectedLandingPreviewCard.reason}
+                </p>
+              </div>
+
+              {showPreviewSigninPrompt && (
+                <div className="bg-amber-50 border border-amber-100 text-amber-800 rounded-2xl p-4 space-y-3">
+                  <p className="text-sm font-black">سجّل دخولك أولاً لطلب المكالمة</p>
+                  <p className="text-xs font-semibold leading-relaxed">
+                    نحتاج حسابك حتى نحجز المكالمة، نحفظ سجلها، ونربطك بمقدم الخدمة بشكل آمن.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedLandingPreviewCard(null);
+                        setShowPreviewSigninPrompt(false);
+                        setSignupRolePreset(false);
+                        setAuthMode('login');
+                        setCurrentView('auth');
+                      }}
+                      className="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-white rounded-xl text-xs font-black"
+                    >
+                      تسجيل الدخول
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedLandingPreviewCard(null);
+                        setShowPreviewSigninPrompt(false);
+                        navigateToSignup('client');
+                      }}
+                      className="flex-1 py-2.5 bg-white hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-black"
+                    >
+                      إنشاء حساب
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleLandingPreviewCall}
+                className="w-full py-3.5 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all shadow-sm shadow-teal-100 flex items-center justify-center gap-2"
+              >
+                <Phone className="w-4 h-4" />
+                طلب مكالمة
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MAIN VIEW CONTROLLER */}
       <main className="flex-1 flex flex-col">
 
@@ -1156,7 +1286,15 @@ export default function App() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {filteredLandingPreviewCards.map(card => (
-                  <article key={card.handle} className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4 min-h-[290px]" dir="rtl">
+                  <article
+                    key={card.handle}
+                    onClick={() => {
+                      setSelectedLandingPreviewCard(card);
+                      setShowPreviewSigninPrompt(false);
+                    }}
+                    className="bento-card p-4 bg-white/95 border-slate-200 text-right flex flex-col gap-4 min-h-[290px] cursor-pointer hover:border-teal-200 hover:-translate-y-1 transition-all"
+                    dir="rtl"
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
                         card.accent === 'amber' ? 'bg-amber-50 text-amber-700' :
@@ -1207,6 +1345,13 @@ export default function App() {
                         متاح الآن
                       </span>
                     </div>
+
+                    <button
+                      type="button"
+                      className="w-full py-2 bg-slate-50 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border border-slate-100 rounded-xl text-[11px] font-black transition-all"
+                    >
+                      عرض التفاصيل
+                    </button>
                   </article>
                 ))}
               </div>
