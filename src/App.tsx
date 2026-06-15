@@ -2753,7 +2753,7 @@ export default function App() {
                   adminActiveTab === 'approvals' ? 'border-indigo-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'
                 }`}
               >
-                طلبات العضوية للخبراء ({adminUsers.filter(u => !u.approved).length})
+                طلبات العضوية للمشاهير والخبراء ({adminUsers.filter(u => !u.approved).length})
               </button>
               <button 
                 onClick={() => setAdminActiveTab('verifications')}
@@ -2796,8 +2796,8 @@ export default function App() {
                     <div className="space-y-4">
                       
                       <div className="flex justify-between items-center">
-                        <h3 className="font-extrabold text-slate-800 text-sm">طلبات العضوية وتأهيل حسابات مزودي الخدمة الجدد</h3>
-                        <span className="text-slate-400 text-xs font-medium">الخبراء والمبدعون الجدد معطلين تلقائياً ريثما يوافق عليهم المدير.</span>
+                        <h3 className="font-extrabold text-slate-800 text-sm">طلبات العضوية وتأهيل حسابات المشاهير والخبراء الجدد</h3>
+                        <span className="text-slate-400 text-xs font-medium">المشاهير والخبراء الجدد لا يظهرون في السوق إلا بعد موافقة الإدارة.</span>
                       </div>
 
                       <div className="overflow-x-auto">
@@ -2814,7 +2814,7 @@ export default function App() {
                           <tbody className="divide-y divide-slate-100 font-semibold text-slate-700">
                             {adminUsers.filter(u => u.role === 'provider').length === 0 ? (
                               <tr>
-                                <td colSpan={5} className="p-8 text-center text-slate-400">لا يوجد أي طلبات تسجيل عضويات خبراء معلقة لمراجعة حالياً.</td>
+                                <td colSpan={5} className="p-8 text-center text-slate-400">لا توجد حالياً طلبات عضوية معلقة للمشاهير أو الخبراء.</td>
                               </tr>
                             ) : (
                               adminUsers.filter(u => u.role === 'provider').map(u => (
