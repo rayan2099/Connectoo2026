@@ -826,65 +826,49 @@ export default function App() {
               </p>
             </div>
 
-            {/* Split Lanes Choice */}
+            {/* Primary intent choice */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-4xl">
               
-              {/* Lane 1: Celebrities */}
-              <div id="celebrity-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-amber-100 bg-white/95">
-                <div className="space-y-4 text-right">
-                  <div className="bg-amber-100 p-4 rounded-2xl text-amber-700 w-12 h-12 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900">تواصل مع مشهور</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    تواصل صوتي خاص مع مؤثر، فنان، لاعب، أو شخصية تتابعها. لحظة مباشرة وليست طلب مساعدة.
-                  </p>
-                </div>
-                <button 
-                  onClick={() => navigateToSignup('client')}
-                  className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                >
-                  شوف المشاهير المتاحين
-                  <ArrowRight className="w-4 h-4 rotate-180" />
-                </button>
-              </div>
-
-              {/* Lane 2: Legal / Expert help */}
-              <div id="expert-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-teal-100 bg-white/95">
+              {/* Caller lane */}
+              <div id="caller-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-teal-100 bg-white/95">
                 <div className="space-y-4 text-right">
                   <div className="bg-teal-100 p-4 rounded-2xl text-teal-700 w-12 h-12 flex items-center justify-center">
-                    <Shield className="w-6 h-6" />
+                    <PhoneCall className="w-6 h-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">تواصل مع خبير</h3>
+                  <h3 className="text-xl font-bold text-gray-900">أريد إجراء مكالمة</h3>
                   <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                    شارع، سيارة، عقد، دواء، حساب مخترق، قلق مفاجئ. اختر القسم المناسب وتحدث مع شخص يفهم الموقف فوراً.
+                    ابحث عن مشهور أو خبير متاح الآن، اختر الشخص المناسب، وابدأ مكالمة صوتية مباشرة بدون موعد.
                   </p>
                 </div>
                 <button 
                   onClick={() => navigateToSignup('client')}
                   className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm shadow-teal-100 cursor-pointer"
                 >
-                  شوف الخبراء المتاحين
+                  ابدأ البحث الآن
                   <ArrowRight className="w-4 h-4 rotate-180" />
                 </button>
               </div>
 
-            </div>
-
-            {/* Provider Application CTA Banner */}
-            <div id="provider-call-to-onboard" className="instant-gradient text-white rounded-3xl p-6 md:p-8 w-full max-w-4xl flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-slate-200/60">
-              <div className="text-right space-y-2">
-                <h3 className="text-lg md:text-xl font-extrabold">هل لديك جمهور أو خبرة يمكن الاتصال بها؟</h3>
-                <p className="text-xs text-indigo-200/90 font-medium">
-                  سواء كنت مؤثراً، فناناً، مستشاراً، أو خبيراً عملياً: حدد سعرك وافتح حالتك ليستطيع الناس الاتصال بك فوراً.
-                </p>
+              {/* Receiver lane */}
+              <div id="receiver-lane-card" className="bento-card p-7 flex flex-col justify-between space-y-6 border-amber-100 bg-white/95">
+                <div className="space-y-4 text-right">
+                  <div className="bg-amber-100 p-4 rounded-2xl text-amber-700 w-12 h-12 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">أريد استقبال مكالمات</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                    للمشاهير، المؤثرين، والخبراء: أنشئ مكتبك، حدد سعرك، وافتح حالتك ليستطيع الناس الاتصال بك فوراً.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => navigateToSignup('provider')}
+                  className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                >
+                  افتح مكتبك الآن
+                  <ArrowRight className="w-4 h-4 rotate-180" />
+                </button>
               </div>
-              <button 
-                onClick={() => navigateToSignup('provider')}
-                className="bg-white hover:bg-slate-50 text-slate-950 px-6 py-3 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer shrink-0"
-              >
-                استقبل مكالمات مدفوعة
-              </button>
+
             </div>
 
           </div>
