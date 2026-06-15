@@ -28,6 +28,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [signupRole, setSignupRole] = useState<'client' | 'provider'>('client');
   const [signupRolePreset, setSignupRolePreset] = useState(false);
+  const [showProviderSignupOptions, setShowProviderSignupOptions] = useState(false);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [authUsername, setAuthUsername] = useState('');
@@ -263,7 +264,8 @@ export default function App() {
         password: authPassword,
         username: authUsername,
         fullName: authFullName,
-        role: signupRole
+        role: signupRole,
+        providerType: signupRole === 'provider' ? settingsProviderType : undefined
       });
 
       setAuthToken(res.token);
@@ -338,6 +340,7 @@ export default function App() {
     setAuthFullName('');
     setAuthError(null);
     setSignupRolePreset(false);
+    setShowProviderSignupOptions(false);
   };
 
   // Navigation Shortcut for landing CTAs
@@ -346,6 +349,12 @@ export default function App() {
     setSignupRolePreset(true);
     setAuthMode('signup');
     setCurrentView('auth');
+  };
+
+  const navigateToProviderSignup = (providerType: 'creator' | 'expert') => {
+    setSettingsProviderType(providerType);
+    setSettingsCategory(providerType === 'creator' ? 'creators-celebrities' : 'legal');
+    navigateToSignup('provider');
   };
 
   // Start outgoing call
@@ -863,13 +872,32 @@ export default function App() {
                     للمشاهير، المؤثرين، والخبراء: أنشئ مكتبك، حدد سعرك، وافتح حالتك ليستطيع الناس الاتصال بك فوراً.
                   </p>
                 </div>
-                <button 
-                  onClick={() => navigateToSignup('provider')}
-                  className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
-                >
-                  افتح مكتبك الآن
-                  <ArrowRight className="w-4 h-4 rotate-180" />
-                </button>
+                {showProviderSignupOptions ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigateToProviderSignup('creator')}
+                      className="py-3 px-3 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                    >
+                      مشهور / مؤثر
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigateToProviderSignup('expert')}
+                      className="py-3 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm shadow-teal-100 cursor-pointer"
+                    >
+                      خبير / مستشار
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowProviderSignupOptions(true)}
+                    className="w-full py-3 px-4 bg-slate-950 hover:bg-slate-800 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    افتح مكتبك الآن
+                    <ArrowRight className="w-4 h-4 rotate-180" />
+                  </button>
+                )}
               </div>
 
             </div>
@@ -891,7 +919,9 @@ export default function App() {
                     ? 'ادخل لحسابك وكمل من آخر نقطة.' 
                     : signupRolePreset
                       ? signupRole === 'provider'
-                        ? 'سننشئ لك حساباً لاستقبال المكالمات من جمهورك أو عملائك.'
+                        ? settingsProviderType === 'creator'
+                          ? 'سننشئ لك حساب مشهور/مؤثر لاستقبال مكالمات من جمهورك.'
+                          : 'سننشئ لك حساب خبير لاستقبال مكالمات استشارية من العملاء.'
                         : 'سننشئ لك حساباً للبحث عن المشاهير والخبراء والاتصال بهم.'
                       : 'اختر هل تريد الاتصال بالآخرين، أم استقبال مكالمات من جمهورك أو عملائك.'}
                 </p>
