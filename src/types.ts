@@ -136,9 +136,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'creators-celebrities',
     providerType: 'creator',
-    labelAr: 'المبدعون والمشاهير',
-    labelEn: 'Creators & Celebrities',
-    descriptionAr: 'اتصل بمؤثريك وفنانيك ومشاهيرك المفضلين فوراً لإجراء مكالمة حصرية.',
+    labelAr: 'لقاءات المبدعين',
+    labelEn: 'Creator Calls',
+    descriptionAr: 'مكالمات صوتية خاصة مع مؤثرين، فنانين، لاعبين، ومشاهير تتابعهم. للتواصل، الأسئلة، التهاني، واللحظات الحصرية.',
     sortOrder: 1,
     active: true,
     subsections: [
@@ -154,9 +154,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'legal',
     providerType: 'expert',
-    labelAr: 'القانون',
-    labelEn: 'Legal Services',
-    descriptionAr: 'استشارات قانونية طارئة وموثوقة من محامين وخبراء معتمدين.',
+    labelAr: 'قانون وطوارئ',
+    labelEn: 'Legal & Urgent Situations',
+    descriptionAr: 'عندما يحدث موقف مفاجئ وتحتاج أن تفهم حقوقك وخطوتك التالية بسرعة، تحدث مع محام أو خبير قانوني متاح.',
     sortOrder: 2,
     active: true,
     subsections: [
@@ -177,9 +177,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'emotional-support',
     providerType: 'expert',
-    labelAr: 'الدعم النفسي والعاطفي',
-    labelEn: 'Emotional Support',
-    descriptionAr: 'تحدث مع متخصصين نفسيين وداعمين عاطفيين لتخطي التوتر والأزمات بلحظتها.',
+    labelAr: 'دعم نفسي فوري',
+    labelEn: 'Immediate Emotional Support',
+    descriptionAr: 'مساحة صوتية هادئة وقت القلق، الضغط، الخلافات، أو اللحظات الثقيلة. تحدث مع مختص أو داعم مؤهل يساعدك ترتب أفكارك.',
     sortOrder: 3,
     active: true,
     subsections: [
@@ -199,9 +199,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'medical-guidance',
     providerType: 'expert',
-    labelAr: 'الإرشاد الطبي والصيدلي',
-    labelEn: 'Medical / Pharmacist Guidance',
-    descriptionAr: 'استشارات صيدلانية وطبية إرشادية آمنة للإجابة العاجلة عن استفساراتك الصحية.',
+    labelAr: 'صحة وأدوية',
+    labelEn: 'Health & Medication',
+    descriptionAr: 'أسئلة سريعة عن دواء، أعراض، تداخلات، أو هل يحتاج الموضوع زيارة طبيب. إرشاد صحي أولي لا يستبدل الطوارئ.',
     sortOrder: 4,
     active: true,
     subsections: [
@@ -222,9 +222,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'career-business',
     providerType: 'expert',
-    labelAr: 'المهنة والأعمال',
-    labelEn: 'Career & Business',
-    descriptionAr: 'اتصل فوراً بمستشاري أعمال ومدربي توظيف لتخطي عقبات مشروعك أو مقابلتك القادمة.',
+    labelAr: 'عمل وأعمال',
+    labelEn: 'Work & Business',
+    descriptionAr: 'قرارات مهنية وتجارية تحتاج جواباً سريعاً: مقابلة، راتب، مشروع، تسويق، أو مشكلة في العمل.',
     sortOrder: 5,
     active: true,
     subsections: [
@@ -245,9 +245,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'tech-support',
     providerType: 'expert',
-    labelAr: 'الدعم التقني',
-    labelEn: 'Tech Support',
-    descriptionAr: 'حل فوري لمشاكل البرمجة والشبكات واستعادة الحسابات المخترقة أو المعطلة.',
+    labelAr: 'تقنية وحسابات',
+    labelEn: 'Tech & Accounts',
+    descriptionAr: 'مشكلة جهاز، إنترنت، حساب مخترق، موقع، تطبيق، أو أداة ذكاء اصطناعي. تحدث مع شخص يعرف الحل العملي.',
     sortOrder: 6,
     active: true,
     subsections: [
@@ -268,9 +268,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'home-car',
     providerType: 'expert',
-    labelAr: 'المنزل والسيارة',
-    labelEn: 'Home & Car Repair',
-    descriptionAr: 'لا تنتظر الفني! اتصل بخبير سباكة أو كهرباء أو ميكانيكي لحل المشكلات المنزلية ومشاكل السيارات.',
+    labelAr: 'منزل وسيارة',
+    labelEn: 'Home & Car',
+    descriptionAr: 'قبل ما تتحرك أو تدفع، خذ رأياً سريعاً من فني أو ميكانيكي حول عطل، فحص، صيانة، أو مشكلة مفاجئة.',
     sortOrder: 7,
     active: true,
     subsections: [
@@ -291,9 +291,9 @@ export const MARKETPLACE_SECTIONS_DATA: Omit<MarketplaceSection, 'id'>[] = [
   {
     slug: 'life-coaching',
     providerType: 'expert',
-    labelAr: 'توجيه الحياة',
-    labelEn: 'Life Coaching',
-    descriptionAr: 'مدربو حياة متمرسون لمساعدتك في اتخاذ القرارات الصعبة وترتيب الأهداف والعادات اليومية.',
+    labelAr: 'حياة وعلاقات',
+    labelEn: 'Life & Relationships',
+    descriptionAr: 'قرارات شخصية، علاقات، عادات، تواصل، أو لحظة تحتاج فيها شخصاً يساعدك ترى الصورة أوضح.',
     sortOrder: 8,
     active: true,
     subsections: [

@@ -4,14 +4,14 @@
 insert into public.marketplace_sections
   (slug, provider_type, label_ar, label_en, description_ar, sort_order, active)
 values
-  ('creators-celebrities', 'creator', 'المبدعون والمشاهير', 'Creators & Celebrities', 'اتصل بمؤثريك وفنانيك ومشاهيرك المفضلين فوراً لإجراء مكالمة حصرية.', 1, true),
-  ('legal', 'expert', 'القانون', 'Legal Services', 'استشارات قانونية طارئة وموثوقة من محامين وخبراء معتمدين.', 2, true),
-  ('emotional-support', 'expert', 'الدعم النفسي والعاطفي', 'Emotional Support', 'تحدث مع متخصصين نفسيين وداعمين عاطفيين لتخطي التوتر والأزمات بلحظتها.', 3, true),
-  ('medical-guidance', 'expert', 'الإرشاد الطبي والصيدلي', 'Medical / Pharmacist Guidance', 'استشارات صيدلانية وطبية إرشادية آمنة للإجابة العاجلة عن استفساراتك الصحية.', 4, true),
-  ('career-business', 'expert', 'المهنة والأعمال', 'Career & Business', 'اتصل فوراً بمستشاري أعمال ومدربي توظيف لتخطي عقبات مشروعك أو مقابلتك القادمة.', 5, true),
-  ('tech-support', 'expert', 'الدعم التقني', 'Tech Support', 'حل فوري لمشاكل البرمجة والشبكات واستعادة الحسابات المخترقة أو المعطلة.', 6, true),
-  ('home-car', 'expert', 'المنزل والسيارة', 'Home & Car Repair', 'لا تنتظر الفني! اتصل بخبير سباكة أو كهرباء أو ميكانيكي لحل المشكلات المنزلية ومشاكل السيارات.', 7, true),
-  ('life-coaching', 'expert', 'توجيه الحياة', 'Life Coaching', 'مدربو حياة متمرسون لمساعدتك في اتخاذ القرارات الصعبة وترتيب الأهداف والعادات اليومية.', 8, true)
+  ('creators-celebrities', 'creator', 'لقاءات المبدعين', 'Creator Calls', 'مكالمات صوتية خاصة مع مؤثرين، فنانين، لاعبين، ومشاهير تتابعهم. للتواصل، الأسئلة، التهاني، واللحظات الحصرية.', 1, true),
+  ('legal', 'expert', 'قانون وطوارئ', 'Legal & Urgent Situations', 'عندما يحدث موقف مفاجئ وتحتاج أن تفهم حقوقك وخطوتك التالية بسرعة، تحدث مع محام أو خبير قانوني متاح.', 2, true),
+  ('emotional-support', 'expert', 'دعم نفسي فوري', 'Immediate Emotional Support', 'مساحة صوتية هادئة وقت القلق، الضغط، الخلافات، أو اللحظات الثقيلة. تحدث مع مختص أو داعم مؤهل يساعدك ترتب أفكارك.', 3, true),
+  ('medical-guidance', 'expert', 'صحة وأدوية', 'Health & Medication', 'أسئلة سريعة عن دواء، أعراض، تداخلات، أو هل يحتاج الموضوع زيارة طبيب. إرشاد صحي أولي لا يستبدل الطوارئ.', 4, true),
+  ('career-business', 'expert', 'عمل وأعمال', 'Work & Business', 'قرارات مهنية وتجارية تحتاج جواباً سريعاً: مقابلة، راتب، مشروع، تسويق، أو مشكلة في العمل.', 5, true),
+  ('tech-support', 'expert', 'تقنية وحسابات', 'Tech & Accounts', 'مشكلة جهاز، إنترنت، حساب مخترق، موقع، تطبيق، أو أداة ذكاء اصطناعي. تحدث مع شخص يعرف الحل العملي.', 6, true),
+  ('home-car', 'expert', 'منزل وسيارة', 'Home & Car', 'قبل ما تتحرك أو تدفع، خذ رأياً سريعاً من فني أو ميكانيكي حول عطل، فحص، صيانة، أو مشكلة مفاجئة.', 7, true),
+  ('life-coaching', 'expert', 'حياة وعلاقات', 'Life & Relationships', 'قرارات شخصية، علاقات، عادات، تواصل، أو لحظة تحتاج فيها شخصاً يساعدك ترى الصورة أوضح.', 8, true)
 on conflict (slug) do update set
   provider_type = excluded.provider_type,
   label_ar = excluded.label_ar,

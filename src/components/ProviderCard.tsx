@@ -25,14 +25,14 @@ export default function ProviderCard({ provider, onCallClick, onProfileClick }: 
   const isOffline = !settings?.availabilityStatus || settings.availabilityStatus === 'offline';
 
   const categoryLabels: Record<string, string> = {
-    'creators-celebrities': 'مبدعون ومشاهير',
-    legal: 'قانون فوري',
-    'emotional-support': 'دعم نفسي',
-    'medical-guidance': 'إرشاد طبي',
-    'career-business': 'أعمال ومهنة',
-    'tech-support': 'دعم تقني',
+    'creators-celebrities': 'لقاءات المبدعين',
+    legal: 'قانون وطوارئ',
+    'emotional-support': 'دعم نفسي فوري',
+    'medical-guidance': 'صحة وأدوية',
+    'career-business': 'عمل وأعمال',
+    'tech-support': 'تقنية وحسابات',
     'home-car': 'منزل وسيارة',
-    'life-coaching': 'توجيه حياة',
+    'life-coaching': 'حياة وعلاقات',
   };
 
   const statusText = isOnline ? 'متاح الآن' : isBusy ? 'في مكالمة' : 'غير متاح';
