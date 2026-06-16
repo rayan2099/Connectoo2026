@@ -1718,6 +1718,7 @@ export default function App() {
             {/* Search, Filter box, category filters */}
             <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-6">
               {currentMarketplaceTab === 'expert' && (
+              {currentMarketplaceTab === 'expert' && (
               <div className="rounded-2xl bg-white/85 border border-teal-100 p-4 md:p-5 space-y-3 text-right">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                   <div className="space-y-1">
