@@ -1717,13 +1717,14 @@ export default function App() {
 
             {/* Search, Filter box, category filters */}
             <div className="glass-panel rounded-3xl p-5 md:p-6 space-y-6">
+              {currentMarketplaceTab === 'expert' && (
               <div className="rounded-2xl bg-white/85 border border-teal-100 p-4 md:p-5 space-y-3 text-right">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
                   <div className="space-y-1">
                     <p className="text-[11px] font-black text-teal-700">مطابقة ذكية حسب احتياجك</p>
                     <h3 className="text-lg font-black text-slate-950">اكتب موقفك، ونقترح لك الشخص الأنسب</h3>
                     <p className="text-xs text-slate-500 font-semibold leading-relaxed">
-                      لا تحتاج تعرف التصنيف. اكتب ما يحدث معك، وسنبحث في التخصصات والبايو الخاص بالمشاهير والخبراء.
+                      لا تحتاج تعرف التصنيف. اكتب ما يحدث معك، وسنبحث في التخصصات ونبذة الخبراء لاختيار الأنسب.
                     </p>
                   </div>
                   {matchHint && (
@@ -1738,7 +1739,7 @@ export default function App() {
                     value={needPrompt}
                     onChange={e => setNeedPrompt(e.target.value)}
                     rows={2}
-                    placeholder="مثال: صار لي موقف في الشارع وما أعرف حقي القانوني، أو حسابي انسرق، أو أبي أكلم مؤثر عن مشروع..."
+                    placeholder="مثال: صار لي موقف في الشارع وما أعرف حقي القانوني، أو حسابي انسرق، أو أحتاج توجيه مهني سريع..."
                     className="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-teal-500/10 focus:border-teal-500 focus:bg-white transition-all text-right resize-none"
                   />
                   <button
@@ -1754,7 +1755,7 @@ export default function App() {
                   {[
                     'تعرضت لمشكلة قانونية وأحتاج محامي الآن',
                     'حسابي انسرق وأحتاج شخص فاهم تقنية',
-                    'أبي مكالمة قصيرة مع مؤثر أحبه'
+                    'أحتاج توجيه مهني سريع قبل قرار مهم'
                   ].map(example => (
                     <button
                       key={example}
@@ -1767,6 +1768,7 @@ export default function App() {
                   ))}
                 </div>
               </div>
+              )}
               
               {/* Row 1: Search & language */}
               <div className="flex flex-col md:flex-row items-stretch gap-4">
