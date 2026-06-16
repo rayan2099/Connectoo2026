@@ -1260,12 +1260,10 @@ export default function App() {
                 <PhoneCall className="w-4 h-4" />
                 مشاهير وخبراء، جاهزون لمكالمة مباشرة
               </span>
-              <div className="mx-auto flex max-w-6xl items-center justify-center gap-6 md:gap-8" dir="rtl">
-                <PhoneCall className="hidden md:block w-20 h-20 lg:w-28 lg:h-28 shrink-0 text-teal-600 scale-x-[-1]" strokeWidth={2.2} />
-                <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.2] text-center">
-                  كلّم مشهور يلهمك أو خبير يساعدك. <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">مكالمة واحدة تكفي.</span>
-                </h1>
-              </div>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.18] text-center space-y-2">
+                <span className="block">كلّم <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-teal-600">مشهور</span> يلهمك</span>
+                <span className="block">أو <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">خبير</span> يساعدك</span>
+              </h1>
               <p className="text-sm md:text-base text-slate-600 font-semibold leading-relaxed max-w-2xl mx-auto">
                 تواصل فوراً مع شخصية تحبها، أو خبير يفهم موقفك. وإذا لديك جمهور أو خبرة، افتح مكتبك واستقبل مكالمات مدفوعة في أي وقت.
               </p>
