@@ -1261,7 +1261,7 @@ export default function App() {
                 مشاهير وخبراء، جاهزون لمكالمة مباشرة
               </span>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.2]">
-                كلّم مشهور يلهمك أو خبير يساعدك. <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600 inline-flex items-center justify-center gap-3"><PhoneCall className="w-9 h-9 md:w-12 md:h-12 text-teal-600" /> مكالمة واحدة تكفي.</span>
+                كلّم مشهور يلهمك أو خبير يساعدك. <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-blue-600">مكالمة واحدة تكفي.</span>
               </h1>
               <p className="text-sm md:text-base text-slate-600 font-semibold leading-relaxed max-w-2xl mx-auto">
                 تواصل فوراً مع شخصية تحبها، أو خبير يفهم موقفك. وإذا لديك جمهور أو خبرة، افتح مكتبك واستقبل مكالمات مدفوعة في أي وقت.
