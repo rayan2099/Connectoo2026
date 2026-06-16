@@ -1255,7 +1255,13 @@ export default function App() {
           <div className="flex-1 flex flex-col justify-center items-center px-4 py-10 max-w-6xl mx-auto space-y-10">
             
             {/* Hero text */}
-            <div className="text-center space-y-5 max-w-4xl">
+            <div className="relative text-center space-y-5 max-w-4xl">
+              <div className="pointer-events-none hidden md:flex absolute -right-20 top-16 w-16 h-16 rounded-full border-4 border-blue-600 text-blue-600 items-center justify-center rotate-12">
+                <PhoneCall className="w-8 h-8" />
+              </div>
+              <div className="pointer-events-none hidden md:flex absolute -left-20 top-28 w-14 h-14 rounded-full border-4 border-teal-600 text-teal-600 items-center justify-center -rotate-12">
+                <PhoneCall className="w-7 h-7" />
+              </div>
               <span className="text-xs font-extrabold tracking-wide text-teal-700 bg-teal-50 border border-teal-100 px-4 py-2 rounded-full inline-flex items-center gap-2">
                 <PhoneCall className="w-4 h-4" />
                 مشاهير وخبراء، جاهزون لمكالمة مباشرة
